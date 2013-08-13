@@ -1,0 +1,26 @@
+Reflex2013 analysis
+Timo Rantalainen 2013 (tjrantal at gmail.com).
+
+Setting up Octave for analysis:
+Download octave and octave pkg from http://sourceforge.net/projects/octave/files/Octave%20Windows%20binaries/
+I used version 3.6.4
+Decompres the files to a folder and follow the instructions to update the .lnk for launching octave (set notepad++ to work as the text editor...)
+Also, in order to get the octave-forge packages (signal is needed), restart octave and run
+pkg rebuild -auto
+cd to the analysis folder and use as you'd use Matlab, i.e.
+>reflex2013Analysis
+
+wait...
+
+Spike smr matlab reader. 
+
+I took the functions from sigTOOL package written by Malcom Lidierth(http://sigtool.sourceforge.net/sigtool.html). I modified the functions to return a structure instead of writing to a file. I also removed the progress bar.
+
+I had to comment out some text and remove nested functions to make the package work with octave
+
+Use:
+add smrReader folder to your path (i.e. addpath('smrReader');)
+use the ImportSMR function to read your data (i.e. data =ImportSMR([dataPath fileName]););
+readSMR.m contains an  example (you'll have to provide your own .smr -file...
+
+

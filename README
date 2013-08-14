@@ -7,6 +7,8 @@ I used version 3.6.4
 Decompres the files to a folder and follow the instructions to update the .lnk for launching octave (set notepad++ to work as the text editor...)
 Also, in order to get the octave-forge packages (signal is needed), restart octave and run
 pkg rebuild -auto
+Remove ad package, which crashes octave in Win7...
+pkg rebuild -noauto ad
 cd to the analysis folder and use as you'd use Matlab, i.e.
 >reflex2013Analysis
 

@@ -69,7 +69,7 @@ c=SONChanList(fid);
 
 % Import the data.
 for i=1:length(c)
-%     keyboard
+    %keyboard
     chan=c(i).number;
     msg=[];
     

@@ -23,7 +23,7 @@ clear all;
 close all;
 fclose all;
 clc;
-
+%cd 'h:/timo/research/Reflex2013/analysis'
 addpath('smrReader');   %For reading the srm-files produced by Spike
 addpath('functions');   %Subfolder, which contains the analysis scripts for different conditions
 %HARD CODED CONSTANTS saved in constants structure 
@@ -83,17 +83,21 @@ for i = 1:length(temp)
         constants.subjectFolders(tempCount).dir = temp(i);    %Remove . and ..
     end
 end
+
+%keyboard
 %Loop through folders..	DEBUG p = 6 p =5 p = 12 p = 4
-for p = 1:length(constants.subjectFolders)
+for p = 2%1:length(constants.subjectFolders)
     fileList = dir([constants.dataFolder separator constants.subjectFolders(p).dir.name separator '*.' constants.dataFileSuffix]);
 	%keyboard
     constants.p = p;
-    for f = 1:length(fileList); %Go through files in a directory
+    for f = 14%1:length(fileList); %Go through files in a directory
         %Reading the protocol text file
 		filename = [constants.dataFolder separator constants.subjectFolders(p).dir.name separator fileList(f).name];
 		%keyboard
         data = ImportSMR([constants.dataFolder separator constants.subjectFolders(p).dir.name separator fileList(f).name]);
-        %Use the proper function for a file of a specific kind
+        keyboard
+		%Use the proper function for a file of a specific kind
+		disp([constants.subjectFolders(p).dir.name ' ' fileList(f).name])
         %Running
         if strfind(lower(fileList(f).name),lower(constants.visualizationTitles{10})) > 0
             %keyboard;

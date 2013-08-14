@@ -44,7 +44,7 @@ function plotStretchOverlay(data,constants,triggerVarIndex,fName,ch)
             end
         end
     end
-    
+    %keyboard
     
     %Find temporal synchronization
     %Get common timestamps
@@ -99,11 +99,11 @@ function plotStretchOverlay(data,constants,triggerVarIndex,fName,ch)
     stretches = find(triggerData <= triggerThresh);
     stretchInits = find(diff(stretches) > 10)+1;
     stretchInits = [1; stretchInits];   %The first is also a beginning...
-%      figure
-%      plot(triggerData);
-%      hold on;
-%      plot(stretches(stretchInits),triggerData(stretches(stretchInits)),'r*','linestyle','none');
-%      pause
+	%keyboard
+    %  figure
+    %  plot(triggerData);
+    %  hold on;
+    %  plot(stretches(stretchInits),triggerData(stretches(stretchInits)),'r*','linestyle','none');
 %     close
     %Plot overlays
     overlayFig = figure;
@@ -137,17 +137,17 @@ function plotStretchOverlay(data,constants,triggerVarIndex,fName,ch)
         end
     end
 %     print('-dpng',['-S' num2str(1200) ',' num2str(1200)],[constants.visualizationFolder constants.separator fName(1:length(fName)-4) '_channel_' num2str(ch) '.png']);
-    if exist([constants.visualizationFolder constants.separator constants.subjectFolders(p).dir.name]) == 0
-        mkdir([constants.visualizationFolder constants.separator constants.subjectFolders(p).dir.name]);
+    if exist([constants.visualizationFolder constants.separator constants.subjectFolders(constants.p).dir.name]) == 0
+        mkdir([constants.visualizationFolder constants.separator constants.subjectFolders(constants.p).dir.name]);
     end
 
 	%Plotting is different between octave and matlab!!
     if exist ('OCTAVE_VERSION', 'builtin') %OCTAVE
 		set(overlayFig,'visible','on');
-		print('-dpng','-r300','-S2400,2400',[constants.visualizationFolder constants.separator constants.subjectFolders(p).dir.name constants.separator fName(1:length(fName)-4) '_channel_' num2str(ch) '.png']);
+		print('-dpng','-r300','-S2400,2400',[constants.visualizationFolder constants.separator constants.subjectFolders(constants.p).dir.name constants.separator fName(1:length(fName)-4) '_channel_' num2str(ch) '.png']);
 		disp('plotted octave')
 	else	%MATLAB
-		print('-dpng','-r300',[constants.visualizationFolder constants.separator constants.subjectFolders(p).dir.name constants.separator fName(1:length(fName)-4) '_channel_' num2str(ch) '.png']);
+		print('-dpng','-r300',[constants.visualizationFolder constants.separator constants.subjectFolders(constants.p).dir.name constants.separator fName(1:length(fName)-4) '_channel_' num2str(ch) '.png']);
 		disp('plotted matlab')
 	end
 	close(overlayFig);

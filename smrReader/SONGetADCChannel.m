@@ -262,7 +262,7 @@ if NumFrames==1
 		%if ~scverLessThan('MATLAB','7')
         %    data=zeros(NumberOfSamples,1,'int16'); %Version 7
         %else
-            data=int16(zeros(NumberOfSamples,1));
+		data=int16(zeros(NumberOfSamples,1));
         %end;
         readformat='int16=>int16';
     end;
@@ -316,17 +316,19 @@ else
         readformat='int16=>double';
     else
         if MatFlag==1
-            if ~scverLessThan('MATLAB','7')
-                data=zeros(1,FrameLength,'int16');%Version 7
-            else
+            %if ~scverLessThan('MATLAB','7')
+            %    data=zeros(1,FrameLength,'int16');%Version 7
+            %else
                 data=int16(zeros(1,FrameLength));
-            end;
+            %end;
         else
-            if ~scverLessThan('MATLAB','7')
-                data=zeros(FrameLength, FramesToReturn,'int16');%Version 7
-            else
-                data=int16(zeros(FrameLength, FramesToReturn));
-            end;
+			%Modified by Timo
+            %if ~scverLessThan('MATLAB','7')
+            %    data=zeros(FrameLength, FramesToReturn,'int16');%Version 7
+            %else
+			%keyboard
+			data=int16(zeros(FrameLength, FramesToReturn));
+            %end;
         end;
         readformat='int16=>int16';
     end;

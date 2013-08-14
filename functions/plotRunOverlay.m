@@ -87,14 +87,14 @@ function plotRunOverlay(data,constants,triggerVarIndex,fName,ch)
         plot(emgAverages(:,p),'r')
     end
 %     print('-dpng',['-S' num2str(1200) ',' num2str(1200)],[constants.visualizationFolder constants.separator fName(1:length(fName)-4) '_channel_' num2str(ch) '.png']);
-    if exist([constants.visualizationFolder constants.separator constants.subjectFolders(p).dir.name]) == 0
-        mkdir([constants.visualizationFolder constants.separator constants.subjectFolders(p).dir.name]);
+    if exist([constants.visualizationFolder constants.separator constants.subjectFolders(constants.p).dir.name]) == 0
+        mkdir([constants.visualizationFolder constants.separator constants.subjectFolders(constants.p).dir.name]);
     end
 	if exist ('OCTAVE_VERSION', 'builtin') %OCTAVE
-		print('-dpng','-r300','-S2400,2400',[constants.visualizationFolder constants.separator constants.subjectFolders(p).dir.name constants.separator fName(1:length(fName)-4) '_channel_' num2str(ch) '.png']);
+		print('-dpng','-r300','-S2400,2400',[constants.visualizationFolder constants.separator constants.subjectFolders(constants.p).dir.name constants.separator fName(1:length(fName)-4) '_channel_' num2str(ch) '.png']);
 		set(overlayFig,'visible','on');
 	else	%MATLAB
-		print('-dpng','-r300',[constants.visualizationFolder constants.separator constants.subjectFolders(p).dir.name constants.separator fName(1:length(fName)-4) '_channel_' num2str(ch) '.png']);
+		print('-dpng','-r300',[constants.visualizationFolder constants.separator constants.subjectFolders(constants.p).dir.name constants.separator fName(1:length(fName)-4) '_channel_' num2str(ch) '.png']);
 	end
 	close(overlayFig);
     

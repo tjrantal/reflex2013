@@ -53,5 +53,6 @@ function synchronization =synchronizeChannels(data)
 		%keyboard
 		synchronization(e).initSampleNo = initSampleNo;
 		synchronization(e).includeSampleNo = includeSampleNo;
+		synchronization(e).includedChans =includedChans;
 	end
 end

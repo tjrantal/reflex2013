@@ -90,13 +90,25 @@ for p = 2%1:length(constants.subjectFolders)
     fileList = dir([constants.dataFolder separator constants.subjectFolders(p).dir.name separator '*.' constants.dataFileSuffix]);
 	%keyboard
     constants.p = p;
-    for f = 13:14%1:length(fileList); %Go through files in a directory
+    for f = 14%2:length(fileList); %Go through files in a directory
         %Reading the protocol text file
 		filename = [constants.dataFolder separator constants.subjectFolders(p).dir.name separator fileList(f).name];
 		%keyboard
         data = ImportSMR([constants.dataFolder separator constants.subjectFolders(p).dir.name separator fileList(f).name]);
 		%Synch channels and concat files with more than one measurement epoch
 		synchronization = synchronizeChannels(data);
+		%for t = 1:length(synchronization)
+		%	figure
+		%	for s =1:length(synchronization(t).includedChans)
+		%		subplot(4,4,s)
+		%		dataToPlot = double(data(synchronization(t).includedChans(s)).imp.adc(synchronization(t).initSampleNo(synchronization(t).includedChans(s)):synchronization(t).initSampleNo(synchronization(t).includedChans(s))+synchronization(t).includeSampleNo(synchronization(t).includedChans(s))))*data(synchronization(t).includedChans(s)).hdr.adc.Scale;    
+		%		plot(dataToPlot)
+		%	end
+		%			for i=1:length(synchronization(t).includedChans),1/(data(synchronization(t).includedChans(i)).hdr.adc.SampleInterval(1)*data(synchronization(t).includedChans(i)).hdr.adc.SampleInterval(2)),end
+		%			disp('Next')
+		%end
+
+
         keyboard
 		%Use the proper function for a file of a specific kind
 		disp([constants.subjectFolders(p).dir.name ' ' fileList(f).name])

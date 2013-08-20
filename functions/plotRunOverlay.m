@@ -85,16 +85,18 @@ function plotRunOverlay(data,synchronization,constants,triggerVarIndex,fName,ch)
     repCount = 0;
     
     for i = 1:length(stretchInits)
-        
-        for p = 1:4
-           set(overlayFig,'currentaxes',sAxis(p));
-%            plot(stretches(stretchInits(i)):stretches(stretchInits(i))+constants.visualizationEpoc,emgData(stretches(stretchInits(i)):stretches(stretchInits(i))+constants.visualizationEpoc,p))
-            plot(emgData(stretches(stretchInits(i)):stretches(stretchInits(i))+constants.visualizationEpocRun,p))
-            emgAverages(:,p) = emgAverages(:,p)+emgData(stretches(stretchInits(i)):stretches(stretchInits(i))+constants.visualizationEpocRun,p);
-        end
-        repCount = repCount +1;
-		set(overlayFig,'currentaxes',sAxis(6));
-		plot(triggerData(stretches(stretchInits(i))-constants.preTriggerEpoc:stretches(stretchInits(i))-constants.preTriggerEpoc+constants.visualizationEpoc))
+        %Ignore triggers that are too close to the end of the data
+		if stretches(stretchInits(i))-constants.preTriggerEpoc+constants.visualizationEpoc < size(emgData,1)
+			for p = 1:4
+			   set(overlayFig,'currentaxes',sAxis(p));
+	%            plot(stretches(stretchInits(i)):stretches(stretchInits(i))+constants.visualizationEpoc,emgData(stretches(stretchInits(i)):stretches(stretchInits(i))+constants.visualizationEpoc,p))
+				plot(emgData(stretches(stretchInits(i)):stretches(stretchInits(i))+constants.visualizationEpocRun,p))
+				emgAverages(:,p) = emgAverages(:,p)+emgData(stretches(stretchInits(i)):stretches(stretchInits(i))+constants.visualizationEpocRun,p);
+			end
+			repCount = repCount +1;
+			set(overlayFig,'currentaxes',sAxis(6));
+			plot(triggerData(stretches(stretchInits(i))-constants.preTriggerEpoc:stretches(stretchInits(i))-constants.preTriggerEpoc+constants.visualizationEpoc))
+		end
     end
     emgAverages = emgAverages/repCount;
     %Plot the averages

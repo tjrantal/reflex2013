@@ -98,19 +98,22 @@ function plotStretchOverlay(data,synchronization,constants,triggerVarIndex,fName
         colourSelection = 'b';
     end
     for i = 1:length(stretchInits)
-        for p = 1:length(emgChannels)
-           set(overlayFig,'currentaxes',sAxis(p));
-%            plot(stretches(stretchInits(i)):stretches(stretchInits(i))+constants.visualizationEpoc,emgData(stretches(stretchInits(i)):stretches(stretchInits(i))+constants.visualizationEpoc,p))
-            plot(emgData(stretches(stretchInits(i))-constants.preTriggerEpoc:stretches(stretchInits(i))-constants.preTriggerEpoc+constants.visualizationEpoc,p),colourSelection)
-           % if p == 1
-            %    set(gca,'ylim',[-5 5])
-            %end
-            if p == 5
-               set(gca,'ylim',[14 22])
-            end
-        end
-		set(overlayFig,'currentaxes',sAxis(6));
-		plot(triggerData(stretches(stretchInits(i))-constants.preTriggerEpoc:stretches(stretchInits(i))-constants.preTriggerEpoc+constants.visualizationEpoc),colourSelection)
+		%If trigger is too late, exclude
+		if stretches(stretchInits(i))-constants.preTriggerEpoc+constants.visualizationEpoc <= size(emgData,1)
+			for p = 1:length(emgChannels)
+			   set(overlayFig,'currentaxes',sAxis(p));
+	%            plot(stretches(stretchInits(i)):stretches(stretchInits(i))+constants.visualizationEpoc,emgData(stretches(stretchInits(i)):stretches(stretchInits(i))+constants.visualizationEpoc,p))
+				plot(emgData(stretches(stretchInits(i))-constants.preTriggerEpoc:stretches(stretchInits(i))-constants.preTriggerEpoc+constants.visualizationEpoc,p),colourSelection)
+			   % if p == 1
+				%    set(gca,'ylim',[-5 5])
+				%end
+				if p == 5
+				   set(gca,'ylim',[14 22])
+				end
+			end
+			set(overlayFig,'currentaxes',sAxis(6));
+			plot(triggerData(stretches(stretchInits(i))-constants.preTriggerEpoc:stretches(stretchInits(i))-constants.preTriggerEpoc+constants.visualizationEpoc),colourSelection)
+		end
     end
 	
 %     print('-dpng',['-S' num2str(1200) ',' num2str(1200)],[constants.visualizationFolder constants.separator fName(1:length(fName)-4) '_channel_' num2str(ch) '.png']);

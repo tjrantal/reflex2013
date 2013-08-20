@@ -16,7 +16,7 @@
 %
 %    Copyright (C) 2013 Timo Rantalainen tjrantal (at) gmail.com
 
-%% Octave/Matlab script to analyse “Determining the stimulus for the stretch reflex in humans” project. Written by Timo Rantalainen 2013 
+%% Octave/Matlab script to analyse Determining the stimulus for the stretch reflex in humans project. Written by Timo Rantalainen 2013 
 
 %setenv("GSC","GSC"); %To get rid of annoying error messages, when printing images...
 clear all;
@@ -97,18 +97,6 @@ for p = 1:length(constants.subjectFolders)
         data = ImportSMR([constants.dataFolder separator constants.subjectFolders(p).dir.name separator fileList(f).name]);
 		%Synch channels and concat files with more than one measurement epoch
 		synchronization = synchronizeChannels(data);
-%		for t = 1:length(synchronization)
-%			figure
-%			for s =1:length(synchronization(t).includedChans)
-%				subplot(4,4,s)
-%				dataToPlot = double(data(synchronization(t).includedChans(s)).imp.adc(synchronization(t).initSampleNo(synchronization(t).includedChans(s)):synchronization(t).initSampleNo(synchronization(t).includedChans(s))+synchronization(t).includeSampleNo(synchronization(t).includedChans(s)),t))*data(synchronization(t).includedChans(s)).hdr.adc.Scale;    
-%				plot(dataToPlot)
-%			end
-%					for i=1:length(synchronization(t).includedChans),1/(data(synchronization(t).includedChans(i)).hdr.adc.SampleInterval(1)*data(synchronization(t).includedChans(i)).hdr.adc.SampleInterval(2)),end
-%					disp('Next')
-%		end
-
-        %keyboard
 		%Use the proper function for a file of a specific kind
 		disp([constants.subjectFolders(p).dir.name ' ' fileList(f).name])
         %Running

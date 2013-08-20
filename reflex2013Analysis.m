@@ -90,14 +90,14 @@ for p = 2%1:length(constants.subjectFolders)
     fileList = dir([constants.dataFolder separator constants.subjectFolders(p).dir.name separator '*.' constants.dataFileSuffix]);
 	%keyboard
     constants.p = p;
-    for f = 14%1:length(fileList); %Go through files in a directory
+    for f = 13:14%1:length(fileList); %Go through files in a directory
         %Reading the protocol text file
 		filename = [constants.dataFolder separator constants.subjectFolders(p).dir.name separator fileList(f).name];
 		%keyboard
         data = ImportSMR([constants.dataFolder separator constants.subjectFolders(p).dir.name separator fileList(f).name]);
 		%Synch channels and concat files with more than one measurement epoch
-		data = synchronizeChannels(data);
-        %keyboard
+		synchronization = synchronizeChannels(data);
+        keyboard
 		%Use the proper function for a file of a specific kind
 		disp([constants.subjectFolders(p).dir.name ' ' fileList(f).name])
         %Running

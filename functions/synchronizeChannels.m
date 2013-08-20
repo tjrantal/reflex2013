@@ -1,7 +1,9 @@
 %A function to synchronize channels and concat files with more than one measurement epoch
-function data =synchronizeChannels(data)
+function synchronization =synchronizeChannels(data)
 	%Get number of data epochs in the file
+	synchronization = struct();
 	i = 1;
+	
 	while 1
 		if isfield(data(i),'hdr')
 			if isfield(data(i).hdr,'adc')
@@ -48,6 +50,8 @@ function data =synchronizeChannels(data)
 		for i = 1:length(includedChans)
 			includeSampleNo(includedChans(i)) = -1+ int32(floor((double(includeTStamps-onsetOffset(1)))*data(includedChans(i)).hdr.tim.Units*data(includedChans(i)).hdr.tim.Scale/(data(includedChans(i)).hdr.adc.SampleInterval(1)*data(includedChans(i)).hdr.adc.SampleInterval(2))));
 		end
-		keyboard
+		%keyboard
+		synchronization(e).initSampleNo = initSampleNo;
+		synchronization(e).includeSampleNo = includeSampleNo;
 	end
 end

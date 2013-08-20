@@ -35,9 +35,9 @@ function synchronization =synchronizeChannels(data)
 		%Find temporal synchronization
 		%Get common timestamps
 		i = 1;
-		onsetOffset(i) = max(tStamps(i,:));
+		onsetOffset(i) = max(tStamps(i,includedChans));
 		i = 2;
-		onsetOffset(i) = min(tStamps(i,:));
+		onsetOffset(i) = min(tStamps(i,includedChans));
 		%Figure out which datapoint is init and how many datapoints to include
 		initSampleNo = [];
 		remainingTStamps = [];
@@ -48,7 +48,7 @@ function synchronization =synchronizeChannels(data)
 		includeTStamps = min(remainingTStamps(includedChans));
 		includeSampleNo = [];
 		for i = 1:length(includedChans)
-			includeSampleNo(includedChans(i)) = -1+ int32(floor((double(includeTStamps-onsetOffset(1)))*data(includedChans(i)).hdr.tim.Units*data(includedChans(i)).hdr.tim.Scale/(data(includedChans(i)).hdr.adc.SampleInterval(1)*data(includedChans(i)).hdr.adc.SampleInterval(2))));
+			includeSampleNo(includedChans(i)) = -1+ int32(floor((double(includeTStamps))*data(includedChans(i)).hdr.tim.Units*data(includedChans(i)).hdr.tim.Scale/(data(includedChans(i)).hdr.adc.SampleInterval(1)*data(includedChans(i)).hdr.adc.SampleInterval(2))));
 		end
 		%keyboard
 		synchronization(e).initSampleNo = initSampleNo;

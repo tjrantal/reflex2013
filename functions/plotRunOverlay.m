@@ -72,6 +72,7 @@ function plotRunOverlay(data,synchronization,constants,triggerVarIndex,fName,ch)
 %     plot(stretches(stretchInits),triggerData(stretches(stretchInits)),'r*','linestyle','none');
 %     pause
 %     close
+%keyboard;
     %Plot overlays
     overlayFig = figure;
     %set(overlayFig,'position',[10 10 1200 1200],'visible','off');
@@ -93,7 +94,7 @@ function plotRunOverlay(data,synchronization,constants,triggerVarIndex,fName,ch)
         end
         repCount = repCount +1;
 		set(overlayFig,'currentaxes',sAxis(6));
-		plot(triggerData(stretches(stretchInits(i))-constants.preTriggerEpoc:stretches(stretchInits(i))-constants.preTriggerEpoc+constants.visualizationEpoc),colourSelection)
+		plot(triggerData(stretches(stretchInits(i))-constants.preTriggerEpoc:stretches(stretchInits(i))-constants.preTriggerEpoc+constants.visualizationEpoc))
     end
     emgAverages = emgAverages/repCount;
     %Plot the averages
@@ -103,12 +104,14 @@ function plotRunOverlay(data,synchronization,constants,triggerVarIndex,fName,ch)
         plot(emgAverages(:,p),'r')
     end
 %     print('-dpng',['-S' num2str(1200) ',' num2str(1200)],[constants.visualizationFolder constants.separator fName(1:length(fName)-4) '_channel_' num2str(ch) '.png']);
+	keyboard
     if exist([constants.visualizationFolder constants.separator constants.subjectFolders(constants.p).dir.name]) == 0
         mkdir([constants.visualizationFolder constants.separator constants.subjectFolders(constants.p).dir.name]);
     end
 	if exist ('OCTAVE_VERSION', 'builtin') %OCTAVE
-		print('-dpng','-r300','-S2400,2400',[constants.visualizationFolder constants.separator constants.subjectFolders(constants.p).dir.name constants.separator fName(1:length(fName)-4) '_channel_' num2str(ch) '.png']);
 		set(overlayFig,'visible','on');
+		print('-dpng','-r300','-S2400,2400',[constants.visualizationFolder constants.separator constants.subjectFolders(constants.p).dir.name constants.separator fName(1:length(fName)-4) '_channel_' num2str(ch) '.png']);
+		
 	else	%MATLAB
 		print('-dpng','-r300',[constants.visualizationFolder constants.separator constants.subjectFolders(constants.p).dir.name constants.separator fName(1:length(fName)-4) '_channel_' num2str(ch) '.png']);
 	end

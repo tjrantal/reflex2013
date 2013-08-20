@@ -95,7 +95,9 @@ for p = 2%1:length(constants.subjectFolders)
 		filename = [constants.dataFolder separator constants.subjectFolders(p).dir.name separator fileList(f).name];
 		%keyboard
         data = ImportSMR([constants.dataFolder separator constants.subjectFolders(p).dir.name separator fileList(f).name]);
-        keyboard
+		%Synch channels and concat files with more than one measurement epoch
+		data = synchronizeChannels(data);
+        %keyboard
 		%Use the proper function for a file of a specific kind
 		disp([constants.subjectFolders(p).dir.name ' ' fileList(f).name])
         %Running

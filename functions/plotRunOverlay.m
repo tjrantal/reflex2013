@@ -1,4 +1,4 @@
-function plotRunOverlay(data,constants,triggerVarIndex,fName,ch)
+function plotRunOverlay(data,synchronization,constants,triggerVarIndex,fName,ch)
     %Channel name  data(chan).hdr.title
     %Channel type data(chan).hdr.channeltype ('Continuous Waveform')
     %Scaling of a given channel is in data(chan).hdr.adc.Scale
@@ -35,18 +35,32 @@ function plotRunOverlay(data,constants,triggerVarIndex,fName,ch)
     end
     
     
+	triggerData =[];
+	emgData = [];
+	samplingFreq = 1/(data(triggerIndex).hdr.adc.SampleInterval(1)*data(triggerIndex).hdr.adc.SampleInterval(2));
+	for e = 1:length(synchronization)	%Concat epochs from a file
+		triggerData = [triggerData; double(data(triggerIndex).imp.adc(synchronization(e).initSampleNo(triggerIndex):synchronization(e).initSampleNo(triggerIndex)+synchronization(e).includeSampleNo(triggerIndex),e))*data(triggerIndex).hdr.adc.Scale];
+		tempEmgData = zeros(synchronization(e).includeSampleNo(triggerIndex)+1,length(emgChannels));
+		
+		for c = 1:length(emgChannels)
+			%Rescale data if it does not have the same sampling frequency as the trigger channel
+			%keyboard
+			tempData =  double(data(emgChannels(c)).imp.adc(synchronization(e).initSampleNo(emgChannels(c)):synchronization(e).initSampleNo(emgChannels(c))+synchronization(e).includeSampleNo(emgChannels(c)),e))*data(emgChannels(c)).hdr.adc.Scale;
+			tempSamplingFreq = 1/(data(emgChannels(c)).hdr.adc.SampleInterval(1)*data(emgChannels(c)).hdr.adc.SampleInterval(2));
+		   if  tempSamplingFreq ~= samplingFreq 
+				resampledTempData= interp1([1:1:length(tempData)],tempData,[1:tempSamplingFreq/samplingFreq:length(angleData)]);%linspace(1,length(angleData),length(angleData)*2+1));
+				resampledTempData = resampledTempData(1:size(synchronization(e).includeSampleNo(triggerIndex)+1,1));
+				%         size(emgData)
+				%         size(resampledAngleData)
+
+				tempEmgData(:,c) = resampledTempData(:);
+		   else 
+			   tempEmgData(:,c) = tempData;    
+		   end
+		end
+		emgData = [emgData; tempEmgData];
+	end
     
-    
-    
-    
-%     keyboard
-    triggerData = double(data(triggerIndex).imp.adc)*data(triggerIndex).hdr.adc.Scale;
-    emgData = zeros(length(data(emgChannels(1)).imp.adc),4);
-    for c = 1:4
-       emgData(:,c) =  double(data(emgChannels(c)).imp.adc)*data(emgChannels(c)).hdr.adc.Scale;
-    end
-    
-    samplingFreq = 1/(data(triggerIndex).hdr.adc.SampleInterval(1)*data(triggerIndex).hdr.adc.SampleInterval(2))
     timeInstants = (0:length(triggerData)-1)/samplingFreq;
     triggerThresh = max(triggerData)/6;
     stretches = find(triggerData > triggerThresh);

@@ -86,41 +86,40 @@ end
 
 %keyboard
 %Loop through folders..	DEBUG p = 6 p =5 p = 12 p = 4
-for p = 2%1:length(constants.subjectFolders)
+for p = 1:length(constants.subjectFolders)
     fileList = dir([constants.dataFolder separator constants.subjectFolders(p).dir.name separator '*.' constants.dataFileSuffix]);
 	%keyboard
     constants.p = p;
-    for f = 14%2:length(fileList); %Go through files in a directory
+    for f = 1:length(fileList); %Go through files in a directory
         %Reading the protocol text file
 		filename = [constants.dataFolder separator constants.subjectFolders(p).dir.name separator fileList(f).name];
 		%keyboard
         data = ImportSMR([constants.dataFolder separator constants.subjectFolders(p).dir.name separator fileList(f).name]);
 		%Synch channels and concat files with more than one measurement epoch
 		synchronization = synchronizeChannels(data);
-		%for t = 1:length(synchronization)
-		%	figure
-		%	for s =1:length(synchronization(t).includedChans)
-		%		subplot(4,4,s)
-		%		dataToPlot = double(data(synchronization(t).includedChans(s)).imp.adc(synchronization(t).initSampleNo(synchronization(t).includedChans(s)):synchronization(t).initSampleNo(synchronization(t).includedChans(s))+synchronization(t).includeSampleNo(synchronization(t).includedChans(s))))*data(synchronization(t).includedChans(s)).hdr.adc.Scale;    
-		%		plot(dataToPlot)
-		%	end
-		%			for i=1:length(synchronization(t).includedChans),1/(data(synchronization(t).includedChans(i)).hdr.adc.SampleInterval(1)*data(synchronization(t).includedChans(i)).hdr.adc.SampleInterval(2)),end
-		%			disp('Next')
-		%end
+%		for t = 1:length(synchronization)
+%			figure
+%			for s =1:length(synchronization(t).includedChans)
+%				subplot(4,4,s)
+%				dataToPlot = double(data(synchronization(t).includedChans(s)).imp.adc(synchronization(t).initSampleNo(synchronization(t).includedChans(s)):synchronization(t).initSampleNo(synchronization(t).includedChans(s))+synchronization(t).includeSampleNo(synchronization(t).includedChans(s)),t))*data(synchronization(t).includedChans(s)).hdr.adc.Scale;    
+%				plot(dataToPlot)
+%			end
+%					for i=1:length(synchronization(t).includedChans),1/(data(synchronization(t).includedChans(i)).hdr.adc.SampleInterval(1)*data(synchronization(t).includedChans(i)).hdr.adc.SampleInterval(2)),end
+%					disp('Next')
+%		end
 
-
-        keyboard
+        %keyboard
 		%Use the proper function for a file of a specific kind
 		disp([constants.subjectFolders(p).dir.name ' ' fileList(f).name])
         %Running
         if strfind(lower(fileList(f).name),lower(constants.visualizationTitles{10})) > 0
             %keyboard;
-            plotRunOverlay(data,constants,2,fileList(f).name,f);
+            plotRunOverlay(data,synchronization,constants,2,fileList(f).name,f);
         end
         %Stretches
         if checkStretchFile(fileList(f).name,constants.visualizationTitles, [1:9]) > 0 
 			%keyboard
-            plotStretchOverlay(data,constants,1,fileList(f).name,f);
+            plotStretchOverlay(data,synchronization,constants,1,fileList(f).name,f);
         end
             
         clear data;

@@ -104,7 +104,7 @@ function plotRunOverlay(data,synchronization,constants,triggerVarIndex,fName,ch)
         plot(emgAverages(:,p),'r')
     end
 %     print('-dpng',['-S' num2str(1200) ',' num2str(1200)],[constants.visualizationFolder constants.separator fName(1:length(fName)-4) '_channel_' num2str(ch) '.png']);
-	keyboard
+	%keyboard
     if exist([constants.visualizationFolder constants.separator constants.subjectFolders(constants.p).dir.name]) == 0
         mkdir([constants.visualizationFolder constants.separator constants.subjectFolders(constants.p).dir.name]);
     end

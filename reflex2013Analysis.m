@@ -86,11 +86,11 @@ end
 
 %keyboard
 %Loop through folders..	DEBUG p = 6 p =5 p = 12 p = 4
-for p = 1%:length(constants.subjectFolders)
+for p = 1:length(constants.subjectFolders)
     fileList = dir([constants.dataFolder separator constants.subjectFolders(p).dir.name separator '*.' constants.dataFileSuffix]);
 	%keyboard
     constants.p = p;
-    for f = 13%1:length(fileList); %Go through files in a directory
+    for f = 1:length(fileList); %Go through files in a directory
         %Reading the protocol text file
 		filename = [constants.dataFolder separator constants.subjectFolders(p).dir.name separator fileList(f).name];
 		%keyboard

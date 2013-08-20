@@ -105,11 +105,14 @@ function plotStretchOverlay(data,synchronization,constants,triggerVarIndex,fName
            % if p == 1
             %    set(gca,'ylim',[-5 5])
             %end
-            %if p == 5
-             %   set(gca,'ylim',[14 22])
-            %end
+            if p == 5
+               set(gca,'ylim',[14 22])
+            end
         end
+		set(overlayFig,'currentaxes',6);
+		plot(triggerData(stretches(stretchInits(i))-constants.preTriggerEpoc:stretches(stretchInits(i))-constants.preTriggerEpoc+constants.visualizationEpoc),colourSelection)
     end
+	
 %     print('-dpng',['-S' num2str(1200) ',' num2str(1200)],[constants.visualizationFolder constants.separator fName(1:length(fName)-4) '_channel_' num2str(ch) '.png']);
     if exist([constants.visualizationFolder constants.separator constants.subjectFolders(constants.p).dir.name]) == 0
         mkdir([constants.visualizationFolder constants.separator constants.subjectFolders(constants.p).dir.name]);

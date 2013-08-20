@@ -76,7 +76,7 @@ function plotRunOverlay(data,synchronization,constants,triggerVarIndex,fName,ch)
     overlayFig = figure;
     %set(overlayFig,'position',[10 10 1200 1200],'visible','off');
 	set(overlayFig,'position',[10 10 600 600],'visible','off');
-    for p = 1:4
+    for p = 1:6
         sAxis(p) = subplot(3,2,p);
         hold on;
     end
@@ -92,7 +92,7 @@ function plotRunOverlay(data,synchronization,constants,triggerVarIndex,fName,ch)
             emgAverages(:,p) = emgAverages(:,p)+emgData(stretches(stretchInits(i)):stretches(stretchInits(i))+constants.visualizationEpocRun,p);
         end
         repCount = repCount +1;
-		set(overlayFig,'currentaxes',6);
+		set(overlayFig,'currentaxes',sAxis(6));
 		plot(triggerData(stretches(stretchInits(i))-constants.preTriggerEpoc:stretches(stretchInits(i))-constants.preTriggerEpoc+constants.visualizationEpoc),colourSelection)
     end
     emgAverages = emgAverages/repCount;

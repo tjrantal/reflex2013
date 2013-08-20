@@ -109,7 +109,7 @@ function plotStretchOverlay(data,synchronization,constants,triggerVarIndex,fName
                set(gca,'ylim',[14 22])
             end
         end
-		set(overlayFig,'currentaxes',6);
+		set(overlayFig,'currentaxes',sAxis(6));
 		plot(triggerData(stretches(stretchInits(i))-constants.preTriggerEpoc:stretches(stretchInits(i))-constants.preTriggerEpoc+constants.visualizationEpoc),colourSelection)
     end
 	

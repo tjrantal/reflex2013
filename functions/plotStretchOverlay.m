@@ -51,7 +51,7 @@ function plotStretchOverlay(data,synchronization,constants,triggerVarIndex,fName
 			tempData =  double(data(emgChannels(c)).imp.adc(synchronization(e).initSampleNo(emgChannels(c)):synchronization(e).initSampleNo(emgChannels(c))+synchronization(e).includeSampleNo(emgChannels(c)),e))*data(emgChannels(c)).hdr.adc.Scale;
 			tempSamplingFreq = 1/(data(emgChannels(c)).hdr.adc.SampleInterval(1)*data(emgChannels(c)).hdr.adc.SampleInterval(2));
 		   if  tempSamplingFreq ~= samplingFreq 
-				resampledTempData= interp1([1:1:length(tempData)],tempData,[1:tempSamplingFreq/samplingFreq:length(angleData)]);%linspace(1,length(angleData),length(angleData)*2+1));
+				resampledTempData= interp1([1:1:length(tempData)],tempData,[1:tempSamplingFreq/samplingFreq:length(tempData)]);%linspace(1,length(angleData),length(angleData)*2+1));
 				resampledTempData = resampledTempData(1:size(synchronization(e).includeSampleNo(triggerIndex)+1,1));
 				%         size(emgData)
 				%         size(resampledAngleData)

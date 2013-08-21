@@ -30,12 +30,20 @@ addpath('functions');   %Subfolder, which contains the analysis scripts for diff
 constants.visualizationEpoc = 499;	%Used to be 200
 constants.preTriggerEpoc = 100;
 constants.visualizationEpocRun = 1000;	%Used to be 200
-constants.baseFolder = 'H:\timo\research\Reflex2013'; %Assuming the script is in the root folder
-separator = '\';
+
+%Enable running the script on Windows or on Linux
+if isempty(strfind(computer,'linux'))
+	constants.baseFolder = 'H:\timo\research\Reflex2013'; %Assuming the script is in the root folder
+	separator = '\';
+	constants.visualizationFolder =[constants.baseFolder separator 'analysis' separator 'visualization'];
+else
+	constants.baseFolder = '/home/timo/Desktop/sf_D_DRIVE/timo/research/Reflex2013'; 
+	separator = '/';
+	constants.visualizationFolder =[constants.baseFolder separator 'analysis' separator 'visualization'];
+end
 constants.separator = separator;
-constants.visualizationFolder =[constants.baseFolder separator 'analysis' separator 'visualization'];
 constants.dataFileSuffix = 'smr';   %Note omit the . Used to search files from a subject's folder
-constants.dataFolder =[constants.baseFolder separator 'REFLEX2013\Stretch reflex'];
+constants.dataFolder =[constants.baseFolder separator 'REFLEX2013' separator 'Stretch reflex'];
 %Hard coded trial names to find
 constants.trialGroups = { ...
     'Passive_1','Passive_3','Passive_6', ...

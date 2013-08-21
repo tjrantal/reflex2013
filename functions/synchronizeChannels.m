@@ -46,13 +46,8 @@ function synchronization =synchronizeChannels(data)
 			remainingTStamps(includedChans(i)) = tStamps(2,includedChans(i))-onsetOffset(1);
 		end
 		includeTStamps = min(remainingTStamps(includedChans));
-		includeSampleNo = [];
-		for i = 1:length(includedChans)
-			includeSampleNo(includedChans(i)) = -1+ int32(floor((double(includeTStamps))*data(includedChans(i)).hdr.tim.Units*data(includedChans(i)).hdr.tim.Scale/(data(includedChans(i)).hdr.adc.SampleInterval(1)*data(includedChans(i)).hdr.adc.SampleInterval(2))));
-		end
-		%keyboard
 		synchronization(e).initSampleNo = initSampleNo;
-		synchronization(e).includeSampleNo = includeSampleNo;
+		synchronization(e).includeTStamps = includeTStamps;
 		synchronization(e).includedChans =includedChans;
 	end
 end

@@ -42,20 +42,20 @@ function plotStretchOverlay(data,synchronization,constants,triggerVarIndex,fName
 	emgData = [];
 	samplingFreq = 1/(data(triggerIndex).hdr.adc.SampleInterval(1)*data(triggerIndex).hdr.adc.SampleInterval(2));
 	for e = 1:length(synchronization)	%Concat epochs from a file
-		triggerData = [triggerData; double(data(triggerIndex).imp.adc(synchronization(e).initSampleNo(triggerIndex):synchronization(e).initSampleNo(triggerIndex)+synchronization(e).includeSampleNo(triggerIndex),e))*data(triggerIndex).hdr.adc.Scale];
-		tempEmgData = zeros(synchronization(e).includeSampleNo(triggerIndex)+1,length(emgChannels));
+		includeSampleNo = -1+int32(floor((double(synchronization(e).includeTStamps))*data(triggerIndex).hdr.tim.Units*data(triggerIndex).hdr.tim.Scale/(data(triggerIndex).hdr.adc.SampleInterval(1)*data(triggerIndex).hdr.adc.SampleInterval(2))));
+		triggerData = [triggerData; double(data(triggerIndex).imp.adc(synchronization(e).initSampleNo(triggerIndex):synchronization(e).initSampleNo(triggerIndex)+includeSampleNo,e))*data(triggerIndex).hdr.adc.Scale];
+		tempEmgData = zeros(includeSampleNo+1,length(emgChannels));
 		
 		for c = 1:length(emgChannels)
 			%Rescale data if it does not have the same sampling frequency as the trigger channel
 			%keyboard
-			tempData =  double(data(emgChannels(c)).imp.adc(synchronization(e).initSampleNo(emgChannels(c)):synchronization(e).initSampleNo(emgChannels(c))+synchronization(e).includeSampleNo(emgChannels(c)),e))*data(emgChannels(c)).hdr.adc.Scale;
+			%Get the final data point number
+			includeSampleNo = -1+int32(floor((double(synchronization(e).includeTStamps))*data(emgChannels(c)).hdr.tim.Units*data(emgChannels(c)).hdr.tim.Scale/(data(emgChannels(c)).hdr.adc.SampleInterval(1)*data(emgChannels(c)).hdr.adc.SampleInterval(2))));
+
+			tempData =  double(data(emgChannels(c)).imp.adc(synchronization(e).initSampleNo(emgChannels(c)):synchronization(e).initSampleNo(emgChannels(c))+includeSampleNo,e))*data(emgChannels(c)).hdr.adc.Scale;
 			tempSamplingFreq = 1/(data(emgChannels(c)).hdr.adc.SampleInterval(1)*data(emgChannels(c)).hdr.adc.SampleInterval(2));
 		   if  tempSamplingFreq ~= samplingFreq 
-				resampledTempData= interp1([1:1:length(tempData)],tempData,[1:tempSamplingFreq/samplingFreq:length(tempData)]);%linspace(1,length(angleData),length(angleData)*2+1));
-				resampledTempData = resampledTempData(1:size(synchronization(e).includeSampleNo(triggerIndex)+1,1));
-				%         size(emgData)
-				%         size(resampledAngleData)
-
+				resampledTempData= interp1([1:1:length(tempData)],tempData,linspace(1,length(tempData),length(triggerData)));				
 				tempEmgData(:,c) = resampledTempData(:);
 		   else 
 			   tempEmgData(:,c) = tempData;    
@@ -98,8 +98,8 @@ function plotStretchOverlay(data,synchronization,constants,triggerVarIndex,fName
         colourSelection = 'b';
     end
     for i = 1:length(stretchInits)
-		%If trigger is too late, exclude
-		if stretches(stretchInits(i))-constants.preTriggerEpoc+constants.visualizationEpoc <= size(emgData,1)
+		%If trigger is too late or too early, exclude
+		if stretches(stretchInits(i))-constants.preTriggerEpoc+constants.visualizationEpoc <= size(emgData,1) && stretches(stretchInits(i))-constants.preTriggerEpoc>0
 			for p = 1:length(emgChannels)
 			   set(overlayFig,'currentaxes',sAxis(p));
 	%            plot(stretches(stretchInits(i)):stretches(stretchInits(i))+constants.visualizationEpoc,emgData(stretches(stretchInits(i)):stretches(stretchInits(i))+constants.visualizationEpoc,p))

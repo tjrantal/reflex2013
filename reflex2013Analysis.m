@@ -110,7 +110,7 @@ for p = 1:length(constants.subjectFolders)
 		disp([constants.subjectFolders(p).dir.name ' ' fileList(f).name])
         %Running
         %Debugging
-        if 1==1
+        if 0==1	%0 == 1 disabled 1 == 1 enabled
         	for t = 1:length(synchronization)
 	        	esa = figure
 	        	set(esa,'position',[10 10 1500 1000],'visible','off');
@@ -142,7 +142,7 @@ for p = 1:length(constants.subjectFolders)
 	end
         end
         
-        if 1 == 0	%Debugging
+        if 1==1 %0 == 1 disabled 1 == 1 enabled	%Debugging
 	        if strfind(lower(fileList(f).name),lower(constants.visualizationTitles{10})) > 0
 	            %keyboard;
 	            plotRunOverlay(data,synchronization,constants,2,fileList(f).name,f);

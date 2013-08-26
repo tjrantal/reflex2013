@@ -42,7 +42,6 @@ function plotRunOverlay(data,synchronization,constants,triggerVarIndex,fName,ch)
 		includeSampleNo = -1+int32(floor((double(synchronization(e).includeTStamps))*data(triggerIndex).hdr.tim.Units*data(triggerIndex).hdr.tim.Scale/(data(triggerIndex).hdr.adc.SampleInterval(1)*data(triggerIndex).hdr.adc.SampleInterval(2))));
 		triggerData = [triggerData; double(data(triggerIndex).imp.adc(synchronization(e).initSampleNo(triggerIndex):synchronization(e).initSampleNo(triggerIndex)+includeSampleNo,e))*data(triggerIndex).hdr.adc.Scale];
 		tempEmgData = zeros(includeSampleNo+1,length(emgChannels));
-		
 		for c = 1:length(emgChannels)
 			
 			%Get the final data point number
@@ -53,9 +52,9 @@ function plotRunOverlay(data,synchronization,constants,triggerVarIndex,fName,ch)
 			%Rescale data if it does not have the same sampling frequency as the trigger channel
 		   if  tempSamplingFreq ~= samplingFreq 
 								resampledTempData= interp1([1:1:length(tempData)],tempData,linspace(1,length(tempData),length(triggerData)));				
-				tempEmgData(:,c) = resampledTempData(:);
+				tempEmgData(:,c) = resampledTempData(:);	
 		   else 
-			   tempEmgData(:,c) = tempData;    
+			   tempEmgData(:,c) = tempData;    	 
 		   end
 		end
 		emgData = [emgData; tempEmgData];
@@ -90,12 +89,12 @@ function plotRunOverlay(data,synchronization,constants,triggerVarIndex,fName,ch)
 			for p = 1:4
 			   set(overlayFig,'currentaxes',sAxis(p));
 	%            plot(stretches(stretchInits(i)):stretches(stretchInits(i))+constants.visualizationEpoc,emgData(stretches(stretchInits(i)):stretches(stretchInits(i))+constants.visualizationEpoc,p))
-				plot(emgData(stretches(stretchInits(i)):stretches(stretchInits(i))+constants.visualizationEpocRun,p))
-				emgAverages(:,p) = emgAverages(:,p)+emgData(stretches(stretchInits(i)):stretches(stretchInits(i))+constants.visualizationEpocRun,p);
+				plot(emgData(stretches(stretchInits(i))-constants.preTriggerEpoc:stretches(stretchInits(i))-constants.preTriggerEpoc+constants.visualizationEpocRun,p))
+				emgAverages(:,p) = emgAverages(:,p)+emgData(stretches(stretchInits(i))-constants.preTriggerEpoc:stretches(stretchInits(i))-constants.preTriggerEpoc+constants.visualizationEpocRun,p);
 			end
 			repCount = repCount +1;
 			set(overlayFig,'currentaxes',sAxis(6));
-			plot(triggerData(stretches(stretchInits(i))-constants.preTriggerEpoc:stretches(stretchInits(i))-constants.preTriggerEpoc+constants.visualizationEpoc))
+			plot(triggerData(stretches(stretchInits(i))-constants.preTriggerEpoc:stretches(stretchInits(i))-constants.preTriggerEpoc+constants.visualizationEpocRun))
 		end
     end
     emgAverages = emgAverages/repCount;

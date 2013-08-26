@@ -70,7 +70,14 @@ function plotStretchOverlay(data,synchronization,constants,triggerVarIndex,fName
     triggerData = filtfilt(b,a,triggerData);
     
     triggerThresh = -0.01;% min(triggerData)/2;
-    stretches = find(triggerData <= triggerThresh);
+    %Select whether we are looking for above or below threshold
+    if max(triggerData)-median(triggerData) <median(triggerData)-min(triggerData)
+	stretches = find(triggerData <= triggerThresh);
+else %Positive trigger
+	triggerThresh =  9*max(triggerData)/10;
+	stretches = find(triggerData >= triggerThresh);
+end
+	
     stretchInits = find(diff(stretches) > 10)+1;
     stretchInits = [1; stretchInits];   %The first is also a beginning...
 	%keyboard

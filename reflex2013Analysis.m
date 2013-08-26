@@ -40,6 +40,7 @@ else
 	constants.baseFolder = '/home/timo/Desktop/sf_D_DRIVE/timo/research/Reflex2013'; 
 	separator = '/';
 	constants.visualizationFolder =[constants.baseFolder separator 'analysis' separator 'visualization'];
+	constants.visualizationFolderALL =[constants.baseFolder separator 'analysis' separator 'visualizeAll'];
 end
 constants.separator = separator;
 constants.dataFileSuffix = 'smr';   %Note omit the . Used to search files from a subject's folder
@@ -108,16 +109,50 @@ for p = 1:length(constants.subjectFolders)
 		%Use the proper function for a file of a specific kind
 		disp([constants.subjectFolders(p).dir.name ' ' fileList(f).name])
         %Running
-        if strfind(lower(fileList(f).name),lower(constants.visualizationTitles{10})) > 0
-            %keyboard;
-            plotRunOverlay(data,synchronization,constants,2,fileList(f).name,f);
+        %Debugging
+        if 1==1
+        	for t = 1:length(synchronization)
+	        	esa = figure
+	        	set(esa,'position',[10 10 1500 1000],'visible','off');
+	        	for i  = 1:4
+	        		for j = 1:4
+	        			if ((i-1)*4+j <= length(data) && synchronization(t).initSampleNo((i-1)*4+j) > 0)
+		        			ploth((i-1)*4+j) = subplot(4,4,(i-1)*4+j);
+		        			dataToPlot = data((i-1)*4+j).imp.adc(:,t);
+		        			origPoints = 1:length(dataToPlot);
+		        			interpPoints = linspace(1,length(origPoints),2^15);
+		        			interpData = interp1(origPoints,dataToPlot,interpPoints,'spline');
+		        			plot(interpData);
+		        			title(data((i-1)*4+j).hdr.title);
+		        			disp([num2str((i-1)*4+j) '_' num2str(length(data((i-1)*4+j).imp.adc))])
+		        			set(ploth((i-1)*4+j),'xlim',[1 2^15]);
+	        			end
+	        			
+	        		end
+		end
+		set(esa,'visible','on');
+		%Plot debug here
+		 if exist([constants.visualizationFolderALL constants.separator constants.subjectFolders(constants.p).dir.name]) == 0
+		        mkdir([constants.visualizationFolderALL constants.separator constants.subjectFolders(constants.p).dir.name]);
+		end
+		print('-dpng','-r300','-S3600,2400',[constants.visualizationFolderALL constants.separator constants.subjectFolders(constants.p).dir.name constants.separator fileList(f).name(1:length(fileList(f).name)-4) '_epoch_' num2str(t) '.png']);
+		disp('plotted octave')
+		close(esa);
+		%keyboard
+	end
         end
-        %Stretches
-        if checkStretchFile(fileList(f).name,constants.visualizationTitles, [1:9]) > 0 
-			%keyboard
-            plotStretchOverlay(data,synchronization,constants,1,fileList(f).name,f);
-        end
-            
+        
+        if 1 == 0	%Debugging
+	        if strfind(lower(fileList(f).name),lower(constants.visualizationTitles{10})) > 0
+	            %keyboard;
+	            plotRunOverlay(data,synchronization,constants,2,fileList(f).name,f);
+	        end
+	        %Stretches
+	        if checkStretchFile(fileList(f).name,constants.visualizationTitles, [1:9]) > 0 
+				%keyboard
+	            plotStretchOverlay(data,synchronization,constants,1,fileList(f).name,f);
+	        end
+         end
         clear data;
     end
 end %Get next file to analyse

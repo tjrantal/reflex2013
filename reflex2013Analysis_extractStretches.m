@@ -115,7 +115,7 @@ for p = 1:length(constants.subjectFolders)
 			stretch = extractStretch(data,synchronization,constants,1,fileList(f).name,f);
 			%get index
 			index = 1;
-			while index < 9 && strfind(lower(fileList(f).name),lower(constants.trialGroups{index})) < 1
+			while index < 9 && isempty(strfind(lower(fileList(f).name),lower(constants.trialGroups{index})))
 				index = index+1;
 			end
 			if strfind(lower(fileList(f).name),lower(constants.trialGroups{index})) > 0

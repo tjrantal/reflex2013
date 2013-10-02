@@ -87,9 +87,92 @@ for f = 1:length(fileList); %Go through files in a directory
 	filename = [constants.dataFolder separator fileList(f).name];
 	%keyboard
 	data = load(filename);
-
 	disp([fileList(f).name])
-	keyboard;
+	%Create folder for overlayResults
+	if exist([constants.visualizationFolder constants.separator fileList(f).name(1:length(fileList(f).name)-4)]) == 0
+        mkdir([constants.visualizationFolder constants.separator fileList(f).name(1:length(fileList(f).name)-4)]);
+    end
+	fName = fileList(f).name(1:length(fileList(f).name)-4);
+	%Go through all combinations of overlays
+	for s = 1:9 %Go through different streches
+		for ss = s:9 %Go through the remaining combinations
+			%plot
+			if ss == s	%fast v.s. slow on the same condition
+				if isfield(data.stretchData(s),'slow') %if slow exists, do the overlay
+					overlayFig = figure;
+					set(overlayFig,'position',[10 10 600 600],'visible','off');
+					hold on;	%hold on for plotting
+					%create subplots
+					for p = 1:6
+						sAxis(p) = subplot(3,2,p);
+						hold on;
+					end
+					%plot the overlays
+					for t = 1:length(data.stretchData(ss).fast.stretchData)
+						for p = 1:size(data.stretchData(ss).fast.stretchData(t).emg,2)
+							set(overlayFig,'currentaxes',sAxis(p));
+							plot(data.stretchData(ss).fast.stretchData(t).emg(:,p),'r-')
+						end
+						set(overlayFig,'currentaxes',sAxis(6));
+						plot(data.stretchData(ss).fast.stretchData(t).trigger,'r-')
+					end
+					
+					for t = 1:length(data.stretchData(ss).slow.stretchData)
+						for p = 1:size(data.stretchData(ss).slow.stretchData(t).emg,2)
+							set(overlayFig,'currentaxes',sAxis(p));
+							plot(data.stretchData(ss).slow.stretchData(t).emg(:,p),'k-')
+						end
+						set(overlayFig,'currentaxes',sAxis(6));
+						plot(data.stretchData(ss).slow.stretchData(t).trigger,'k-')
+					end
+					
+					if exist ('OCTAVE_VERSION', 'builtin') %OCTAVE
+						set(overlayFig,'visible','on');
+						print('-dpng','-r300','-S2400,2400',[constants.visualizationFolder constants.separator fileList(f).name(1:length(fileList(f).name)-4) constants.separator fName '_' constants.visualizationTitles{ss} '_' constants.visualizationTitles{s} '_slowvsFast' '.png']);
+					else	%MATLAB
+						print('-dpng','-r300',[constants.visualizationFolder constants.separator fileList(f).name(1:length(fileList(f).name)-4) constants.separator fName '_' constants.visualizationTitles{ss} '_' constants.visualizationTitles{s} '_slowvsFast' .png']);
+					end
+					close(overlayFig);	
+				end
+			else
+				%PLOT FAST OVERLAYS
+				overlayFig = figure;
+					set(overlayFig,'position',[10 10 600 600],'visible','off');
+					hold on;	%hold on for plotting
+					%create subplots
+					for p = 1:6
+						sAxis(p) = subplot(3,2,p);
+						hold on;
+					end
+					%plot the overlays
+					for t = 1:length(data.stretchData(ss).fast.stretchData)
+						for p = 1:size(data.stretchData(ss).fast.stretchData(t).emg,2)
+							set(overlayFig,'currentaxes',sAxis(p));
+							plot(data.stretchData(ss).fast.stretchData(t).emg(:,p),'r-')
+						end
+						set(overlayFig,'currentaxes',sAxis(6));
+						plot(data.stretchData(ss).fast.stretchData(t).trigger,'r-')
+					end
+					
+					for t = 1:length(data.stretchData(s).fast.stretchData)
+						for p = 1:size(data.stretchData(s).fast.stretchData(t).emg,2)
+							set(overlayFig,'currentaxes',sAxis(p));
+							plot(data.stretchData(s).fast.stretchData(t).emg(:,p),'k-')
+						end
+						set(overlayFig,'currentaxes',sAxis(6));
+						plot(data.stretchData(s).fast.stretchData(t).trigger,'k-')
+					end
+					
+					if exist ('OCTAVE_VERSION', 'builtin') %OCTAVE
+						set(overlayFig,'visible','on');
+						print('-dpng','-r300','-S2400,2400',[constants.visualizationFolder constants.separator fileList(f).name(1:length(fileList(f).name)-4) constants.separator fName '_' constants.visualizationTitles{ss} '_' constants.visualizationTitles{s} '.png']);
+					else	%MATLAB
+						print('-dpng','-r300',[constants.visualizationFolder constants.separator fileList(f).name(1:length(fileList(f).name)-4) constants.separator fName '_' constants.visualizationTitles{ss} '_' constants.visualizationTitles{s} '.png']);
+					end
+					close(overlayFig);	
+			end
+		end
+	end
 	clear data;
 end
 %keyboard;

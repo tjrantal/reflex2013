@@ -66,7 +66,7 @@ function  stretchData = extractRun(data,synchronization,constants,triggerVarInde
 	
     timeInstants = (0:length(triggerData)-1)/samplingFreq;
 	%Differs from stretch data
-	triggerThresh = max(triggerData)/6;
+	triggerThresh = max(triggerData)/20;
 	stretches = find(triggerData > triggerThresh);
 	stretchInits = find(diff(stretches) > 10)+1;
 
@@ -75,7 +75,9 @@ function  stretchData = extractRun(data,synchronization,constants,triggerVarInde
 	included = 0;
     for i = 1:length(stretchInits)
 		%If trigger is too late or too early, exclude
-		if stretches(stretchInits(i))-constants.preTriggerEpoc+constants.visualizationEpocRun <= size(emgData,1) && stretches(stretchInits(i))-constants.preTriggerEpoc>0
+		%Exclude, it the maximum during epoch isn't high enough...
+		if stretches(stretchInits(i))-constants.preTriggerEpoc+constants.visualizationEpocRun <= size(emgData,1) && stretches(stretchInits(i))-constants.preTriggerEpoc>0 &&
+			max(triggerData(stretches(stretchInits(i))-constants.preTriggerEpoc:stretches(stretchInits(i))-constants.preTriggerEpoc+constants.visualizationEpoc)) > max(triggerData)/3
 			included = included+1;
 			stretchData(included).emg = emgData(stretches(stretchInits(i))-constants.preTriggerEpoc:stretches(stretchInits(i))-constants.preTriggerEpoc+constants.visualizationEpoc,:);
 			stretchData(included).trigger = triggerData(stretches(stretchInits(i))-constants.preTriggerEpoc:stretches(stretchInits(i))-constants.preTriggerEpoc+constants.visualizationEpoc);

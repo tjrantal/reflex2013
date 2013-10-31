@@ -96,7 +96,11 @@ for f = 1:length(fileList);%:1:length(fileList); %Go through files in a director
 
 				%PLOT FAST OVERLAYS
 				overlayFig = figure;
-					set(overlayFig,'position',[10 10 600 600],'visible','off');
+					if 1	%Debugging, 1 = debug
+						set(overlayFig,'position',[10 10 600 600],'visible','on');
+					else
+						set(overlayFig,'position',[10 10 600 600],'visible','off');
+					end
 					hold on;	%hold on for plotting
 					%create subplots
 					for p = 1:6
@@ -104,14 +108,21 @@ for f = 1:length(fileList);%:1:length(fileList); %Go through files in a director
 						hold on;
 					end
 					%plot the overlays
+					%keyboard;
+					tempData = zeros(size(data.runData(1).emg,1),size(data.runData(1).emg,2),length(data.runData));
+					tempTrig = zeros(size(data.runData(1).trigger,1),length(data.runData));
 					for t = 1:length(data.runData)
 						for p = 1:size(data.runData(t).emg,2)
 							set(overlayFig,'currentaxes',sAxis(p));
 							plot(data.runData(t).emg(:,p),'r-')
+							
 						end
+						tempData(:,:,t) = data.runData(t).emg;
+						tempTrig(:,t) = data.runData(t).trigger;
 						set(overlayFig,'currentaxes',sAxis(6));
-						plot(data.runData.trigger,'r-')
+						plot(data.runData(t).trigger,'r-')
 					end
+					
 
 					
 					if exist ('OCTAVE_VERSION', 'builtin') %OCTAVE
@@ -120,8 +131,41 @@ for f = 1:length(fileList);%:1:length(fileList); %Go through files in a director
 					else	%MATLAB
 						print('-dpng','-r300',[constants.visualizationFolder constants.separator fileList(f).name(1:length(fileList(f).name)-4) constants.separator fName  '_running' '.png']);
 					end
-					close(overlayFig);	
-			
+					close(overlayFig);
+					%Plot meanTraces
+					overlayFig = figure;
+					if 1	%Debugging, 1 = debug
+						set(overlayFig,'position',[10 10 600 600],'visible','on');
+					else
+						set(overlayFig,'position',[10 10 600 600],'visible','off');
+					end
+					hold on;	%hold on for plotting
+					%create subplots
+					for p = 1:6
+						sAxis(p) = subplot(3,2,p);
+						hold on;
+					end
+					%Plot meanTraces
+					plotMean = mean(tempData,3);
+					%Remove possible DC offset
+					for p = 1:size(plotMean,2)
+						plotMean(:,p) = plotMean(:,p)-mean(plotMean(:,p));
+					end
+					plotMean = sqrt(plotMean.^2);
+					trigMean = mean(tempTrig,2);
+					for p = 1:size(data.runData(1).emg,2)
+						set(overlayFig,'currentaxes',sAxis(p));
+						plot(plotMean(:,p),'k-','linewidth',3)
+					end
+					set(overlayFig,'currentaxes',sAxis(6));
+					plot(trigMean,'k-','linewidth',3);					
+					if exist ('OCTAVE_VERSION', 'builtin') %OCTAVE
+						set(overlayFig,'visible','on');
+						print('-dpng','-r300','-S2400,2400',[constants.visualizationFolder constants.separator fileList(f).name(1:length(fileList(f).name)-4) constants.separator fName '_mean_running' '.png']);
+					else	%MATLAB
+						print('-dpng','-r300',[constants.visualizationFolder constants.separator fileList(f).name(1:length(fileList(f).name)-4) constants.separator fName  '_mean_running' '.png']);
+					end
+					close(overlayFig);
 	clear data;
 end
 %keyboard;

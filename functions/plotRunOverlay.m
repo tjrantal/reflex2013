@@ -51,7 +51,7 @@ function plotRunOverlay(data,synchronization,constants,triggerVarIndex,fName,ch)
 			tempSamplingFreq = 1/(data(emgChannels(c)).hdr.adc.SampleInterval(1)*data(emgChannels(c)).hdr.adc.SampleInterval(2));
 			%Rescale data if it does not have the same sampling frequency as the trigger channel
 		   if  tempSamplingFreq ~= samplingFreq 
-								resampledTempData= interp1([1:1:length(tempData)],tempData,linspace(1,length(tempData),length(triggerData)));				
+				resampledTempData= interp1([1:1:length(tempData)],tempData,linspace(1,length(tempData),length(triggerData)));				
 				tempEmgData(:,c) = resampledTempData(:);	
 		   else 
 			   tempEmgData(:,c) = tempData;    	 

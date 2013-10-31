@@ -1,0 +1,23 @@
+Create .mat files for participants to save time
+	reflex2013Analysis_extractStretches
+
+Create overlays of different combinations of stretches
+	
+
+Analyse maximal forces and corresponding EMGs
+	MVC
+	1000 ms RMS EMG
+	1000 ms mean torque
+
+Analyse Stretches
+	Reflex 
+	latency	 from stretch init	(defined as?)
+	5 ms RMS	initial portion
+	15 ms RMS	later portion
+	20 ms RMS	total
+
+Analyse running on spot (N.B. needed to rename the runninOnSpot to RunningOnSpot for participant 6...)
+	latency from ground contact init (defined as?)
+	5 ms RMS	initial portion
+	15 ms RMS	later portion
+	20 ms RMS	total

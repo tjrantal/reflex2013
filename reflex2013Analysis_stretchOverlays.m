@@ -82,7 +82,7 @@ constants.forceLevels = {'Passive','10% MVC','50% MVC'};
 fileList = dir([constants.dataFolder  separator '*.' constants.dataFileSuffix]);
 %keyboard
 stretchData = struct();
-for f = 1:length(fileList); %Go through files in a directory
+for f = 1:length(fileList);%:1:length(fileList); %Go through files in a directory
 	%Reading the protocol text file
 	filename = [constants.dataFolder separator fileList(f).name];
 	%keyboard
@@ -99,40 +99,42 @@ for f = 1:length(fileList); %Go through files in a directory
 			%plot
 			if ss == s	%fast v.s. slow on the same condition
 				if isfield(data.stretchData(s),'slow') %if slow exists, do the overlay
-					overlayFig = figure;
-					set(overlayFig,'position',[10 10 600 600],'visible','off');
-					hold on;	%hold on for plotting
-					%create subplots
-					for p = 1:6
-						sAxis(p) = subplot(3,2,p);
-						hold on;
-					end
-					%plot the overlays
-					for t = 1:length(data.stretchData(ss).fast.stretchData)
-						for p = 1:size(data.stretchData(ss).fast.stretchData(t).emg,2)
-							set(overlayFig,'currentaxes',sAxis(p));
-							plot(data.stretchData(ss).fast.stretchData(t).emg(:,p),'r-')
+					if isfield(data.stretchData(s).slow,'stretchData')
+						overlayFig = figure;
+						set(overlayFig,'position',[10 10 600 600],'visible','off');
+						hold on;	%hold on for plotting
+						%create subplots
+						for p = 1:6
+							sAxis(p) = subplot(3,2,p);
+							hold on;
 						end
-						set(overlayFig,'currentaxes',sAxis(6));
-						plot(data.stretchData(ss).fast.stretchData(t).trigger,'r-')
-					end
-					
-					for t = 1:length(data.stretchData(ss).slow.stretchData)
-						for p = 1:size(data.stretchData(ss).slow.stretchData(t).emg,2)
-							set(overlayFig,'currentaxes',sAxis(p));
-							plot(data.stretchData(ss).slow.stretchData(t).emg(:,p),'k-')
+						%plot the overlays
+						for t = 1:length(data.stretchData(ss).fast.stretchData)
+							for p = 1:size(data.stretchData(ss).fast.stretchData(t).emg,2)
+								set(overlayFig,'currentaxes',sAxis(p));
+								plot(data.stretchData(ss).fast.stretchData(t).emg(:,p),'r-')
+							end
+							set(overlayFig,'currentaxes',sAxis(6));
+							plot(data.stretchData(ss).fast.stretchData(t).trigger,'r-')
 						end
-						set(overlayFig,'currentaxes',sAxis(6));
-						plot(data.stretchData(ss).slow.stretchData(t).trigger,'k-')
+						
+						for t = 1:length(data.stretchData(ss).slow.stretchData)
+							for p = 1:size(data.stretchData(ss).slow.stretchData(t).emg,2)
+								set(overlayFig,'currentaxes',sAxis(p));
+								plot(data.stretchData(ss).slow.stretchData(t).emg(:,p),'k-')
+							end
+							set(overlayFig,'currentaxes',sAxis(6));
+							plot(data.stretchData(ss).slow.stretchData(t).trigger,'k-')
+						end
+						
+						if exist ('OCTAVE_VERSION', 'builtin') %OCTAVE
+							set(overlayFig,'visible','on');
+							print('-dpng','-r300','-S2400,2400',[constants.visualizationFolder constants.separator fileList(f).name(1:length(fileList(f).name)-4) constants.separator fName '_' constants.visualizationTitles{ss} '_' constants.visualizationTitles{s} '_slowvsFast' '.png']);
+						else	%MATLAB
+							print('-dpng','-r300',[constants.visualizationFolder constants.separator fileList(f).name(1:length(fileList(f).name)-4) constants.separator fName '_' constants.visualizationTitles{ss} '_' constants.visualizationTitles{s} '_slowvsFast' .png']);
+						end
+						close(overlayFig);	
 					end
-					
-					if exist ('OCTAVE_VERSION', 'builtin') %OCTAVE
-						set(overlayFig,'visible','on');
-						print('-dpng','-r300','-S2400,2400',[constants.visualizationFolder constants.separator fileList(f).name(1:length(fileList(f).name)-4) constants.separator fName '_' constants.visualizationTitles{ss} '_' constants.visualizationTitles{s} '_slowvsFast' '.png']);
-					else	%MATLAB
-						print('-dpng','-r300',[constants.visualizationFolder constants.separator fileList(f).name(1:length(fileList(f).name)-4) constants.separator fName '_' constants.visualizationTitles{ss} '_' constants.visualizationTitles{s} '_slowvsFast' .png']);
-					end
-					close(overlayFig);	
 				end
 			else
 				%PLOT FAST OVERLAYS

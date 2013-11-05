@@ -38,6 +38,7 @@ end
 constants.separator = separator;
 constants.dataFileSuffix = 'mat';   %Note omit the . Used to search files from a subject's folder
 constants.dataFolder =[constants.baseFolder separator 'analysis' separator 'stretches'];
+constants.resultsFolder =[constants.baseFolder separator 'analysis' separator 'results'];
 constants.visualizationFolder =[constants.baseFolder separator 'analysis' separator 'stretchVisualization'];
 
 %Hard coded trial names to find
@@ -82,7 +83,7 @@ constants.forceLevels = {'Passive','10% MVC','50% MVC'};
 fileList = dir([constants.dataFolder  separator '*.' constants.dataFileSuffix]);
 %keyboard
 stretchData = struct();
-for f = 1:length(fileList);%:1:length(fileList); %Go through files in a directory
+for f = 3%1:length(fileList);%:1:length(fileList); %Go through files in a directory
 	%Reading the protocol text file
 	filename = [constants.dataFolder separator fileList(f).name];
 	%keyboard
@@ -93,87 +94,43 @@ for f = 1:length(fileList);%:1:length(fileList); %Go through files in a director
         mkdir([constants.visualizationFolder constants.separator fileList(f).name(1:length(fileList(f).name)-4)]);
     end
 	fName = fileList(f).name(1:length(fileList(f).name)-4);
-	%Go through all combinations of overlays
-	for s = 1:9 %Go through different streches
-		for ss = s:9 %Go through the remaining combinations
-			%plot
-			if ss == s	%fast v.s. slow on the same condition
-				if isfield(data.stretchData(s),'slow') %if slow exists, do the overlay
-					if isfield(data.stretchData(s).slow,'stretchData')
-						overlayFig = figure;
-						set(overlayFig,'position',[10 10 600 600],'visible','off');
-						hold on;	%hold on for plotting
-						%create subplots
-						for p = 1:6
-							sAxis(p) = subplot(3,2,p);
-							hold on;
-						end
-						%plot the overlays
-						for t = 1:length(data.stretchData(ss).fast.stretchData)
-							for p = 1:size(data.stretchData(ss).fast.stretchData(t).emg,2)
-								set(overlayFig,'currentaxes',sAxis(p));
-								plot(data.stretchData(ss).fast.stretchData(t).emg(:,p),'r-')
-							end
-							set(overlayFig,'currentaxes',sAxis(6));
-							plot(data.stretchData(ss).fast.stretchData(t).trigger,'r-')
-						end
-						
-						for t = 1:length(data.stretchData(ss).slow.stretchData)
-							for p = 1:size(data.stretchData(ss).slow.stretchData(t).emg,2)
-								set(overlayFig,'currentaxes',sAxis(p));
-								plot(data.stretchData(ss).slow.stretchData(t).emg(:,p),'k-')
-							end
-							set(overlayFig,'currentaxes',sAxis(6));
-							plot(data.stretchData(ss).slow.stretchData(t).trigger,'k-')
-						end
-						
-						if exist ('OCTAVE_VERSION', 'builtin') %OCTAVE
-							set(overlayFig,'visible','on');
-							print('-dpng','-r300','-S2400,2400',[constants.visualizationFolder constants.separator fileList(f).name(1:length(fileList(f).name)-4) constants.separator fName '_' constants.visualizationTitles{ss} '_' constants.visualizationTitles{s} '_slowvsFast' '.png']);
-						else	%MATLAB
-							print('-dpng','-r300',[constants.visualizationFolder constants.separator fileList(f).name(1:length(fileList(f).name)-4) constants.separator fName '_' constants.visualizationTitles{ss} '_' constants.visualizationTitles{s} '_slowvsFast' .png']);
-						end
-						close(overlayFig);	
-					end
-				end
-			else
-				%PLOT FAST OVERLAYS
-				overlayFig = figure;
-					set(overlayFig,'position',[10 10 600 600],'visible','off');
-					hold on;	%hold on for plotting
-					%create subplots
-					for p = 1:6
-						sAxis(p) = subplot(3,2,p);
-						hold on;
-					end
-					%plot the overlays
-					for t = 1:length(data.stretchData(ss).fast.stretchData)
-						for p = 1:size(data.stretchData(ss).fast.stretchData(t).emg,2)
-							set(overlayFig,'currentaxes',sAxis(p));
-							plot(data.stretchData(ss).fast.stretchData(t).emg(:,p),'r-')
-						end
-						set(overlayFig,'currentaxes',sAxis(6));
-						plot(data.stretchData(ss).fast.stretchData(t).trigger,'r-')
-					end
-					
-					for t = 1:length(data.stretchData(s).fast.stretchData)
-						for p = 1:size(data.stretchData(s).fast.stretchData(t).emg,2)
-							set(overlayFig,'currentaxes',sAxis(p));
-							plot(data.stretchData(s).fast.stretchData(t).emg(:,p),'k-')
-						end
-						set(overlayFig,'currentaxes',sAxis(6));
-						plot(data.stretchData(s).fast.stretchData(t).trigger,'k-')
-					end
-					
-					if exist ('OCTAVE_VERSION', 'builtin') %OCTAVE
-						set(overlayFig,'visible','on');
-						print('-dpng','-r300','-S2400,2400',[constants.visualizationFolder constants.separator fileList(f).name(1:length(fileList(f).name)-4) constants.separator fName '_' constants.visualizationTitles{ss} '_' constants.visualizationTitles{s} '.png']);
-					else	%MATLAB
-						print('-dpng','-r300',[constants.visualizationFolder constants.separator fileList(f).name(1:length(fileList(f).name)-4) constants.separator fName '_' constants.visualizationTitles{ss} '_' constants.visualizationTitles{s} '.png']);
-					end
-					close(overlayFig);	
-			end
+	%Go through all stretches
+	for s = 1:9 %Go through different stretches
+		%Analyse slow
+		meanTrace = getMeanStretch(data.stretchData(s));
+		%Plot test figure
+		overlayFig = figure;
+		set(overlayFig,'position',[10 10 600 600],'visible','on');
+		%create subplots
+		for p = 1:6
+			sAxis(p) = subplot(3,2,p);
+			hold on;
 		end
+		for p = 1:size(meanTrace.fast.emg,2)
+			set(overlayFig,'currentaxes',sAxis(p));
+			plot(meanTrace.fast.emg(:,p),'k-','linewidth',3)
+		end
+		set(overlayFig,'currentaxes',sAxis(6));
+		plot(meanTrace.fast.trigger,'k-','linewidth',3);					
+		if isfield(meanTrace,'slow') % check if slow exists
+			%Plot test figure
+			overlayFig = figure;
+			set(overlayFig,'position',[10 10 600 600],'visible','on');
+			%create subplots
+			for p = 1:6
+				sAxis(p) = subplot(3,2,p);
+				hold on;
+			end
+			for p = 1:size(meanTrace.slow.emg,2)
+				set(overlayFig,'currentaxes',sAxis(p));
+				plot(meanTrace.slow.emg(:,p),'k-','linewidth',3)
+			end
+			set(overlayFig,'currentaxes',sAxis(6));
+			plot(meanTrace.slow.trigger,'k-','linewidth',3);					
+		end
+
+
+
 	end
 	clear data;
 end

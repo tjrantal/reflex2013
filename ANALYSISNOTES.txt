@@ -21,3 +21,24 @@ Analyse running on spot (N.B. needed to rename the runninOnSpot to RunningOnSpot
 	5 ms RMS	initial portion
 	15 ms RMS	later portion
 	20 ms RMS	total
+
+	
+I extracted the steps from the running. I applied a threshold of 1/20th of the maximum of the measured pressure over the whole running trial, accepting contacts that had a minimum maximum value of 1/3 the maximum (this was to have some sort of consistency for timing) (in bitbucket functions/extractRun.m lines 69 onwards). I’m not too impressed with the result, cannot really say that there is an evident stretch reflex anywhere.
+
+This will definitely be the harder condition, but actually there are some reasonable data there. In Matti’s data (figures in row 1), there is a nice burst of activity at around 40-50ms (SLR), and the same is true for Ben. You could check from my plos one paper* but I think that for running trials I took average EMG over the first 30ms of ground contact (since we know there’s no reflex yet), and then waited for the signal to exceed 3SD of that average. Then I visually checked that result and in most cases, it looked to give an accurate onset latency within +- 1 or 2 ms. In some cases that will give quite small reflex amplitudes (e.g. for Ilona), but I think that’s the only ‘fair’ way of doing it. If we just look for a clear peak every time, we will always find one, but we know that the reflex (if it occurs) will occur in a specific time window, so maybe some of these subjects just don’t have large reflexes. 
+
+I re-synchronized all of the stretches using ½ of the maximum value of the synch signal  as the threshold (in bitbucket functions/extractStrettch.m lines 74 – 80). This gave consistent synch for Matti as well (although this doesn’t work for Ilona), so I’m happy with that.
+
+Nice. These look really clear and definitely useable.
+
+The question is, how do we determine latency? Also, how do we process the signal. Should I analyse each trial by itself? Should I average all trials of a given condition and analyse the averaged signal? Something else?
+
+There seems to be no gold standard but there are a couple of possibilities:
+
+1)	First average all trials (after correcting for differences in the start of the stretch obviously), then set a window around 20-60ms relative to stretch onset, and within that window, manually detect the start time of the reflex burst. This works much better in passive conditions as there’s no background EMG, but should also be possible for 10/50%.
+2)	Same as for running: get mean EMG between stretch onset and 30ms, then wait for signal to exceed X SDs of the mean. This could be tricky because of the different force levels. One threshold may not work for all. One possibility is to try 1SD and see if it works in all cases, and if not, then for example use 1SD for 0 and 10%, and 2SD for 50%, and we can argue that we used different thresholds on the basis of visual inspection. Visually inspecting that the threshold works is probably a lot quicker than actually manually determining the onsets for each condition. And of course we can show sample data in the paper to highlight that a single threshold may not work in all cases.
+
+I think I may have already answered the other question, but I would get the mean of all trials for a condition, then use that signal for the analysis. I have always used this method and it was** good enough for J Phys. 
+
+* I could also check but I am starting a big project today and can’t be bothered. After this I’m going straight to the lab. In any case it’s open access, so at least you’ll be able to get the paper.
+**Although probably not anymore, since they have become bastard Nazi Brit haters, which is code for ‘they stopped accepting my papers’.

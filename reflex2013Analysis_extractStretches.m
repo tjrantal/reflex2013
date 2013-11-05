@@ -28,7 +28,7 @@ addpath('smrReader');   %For reading the srm-files produced by Spike
 addpath('functions');   %Subfolder, which contains the analysis scripts for different conditions
 %HARD CODED CONSTANTS saved in constants structure 
 constants.visualizationEpoc = 499;	%Used to be 200
-constants.preTriggerEpoc = 100;
+constants.preTriggerEpoc = 500;
 constants.visualizationEpocRun = 1000;	%Used to be 200
 
 %Enable running the script on Windows or on Linux

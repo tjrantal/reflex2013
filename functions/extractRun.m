@@ -81,7 +81,8 @@ function  stretchData = extractRun(data,synchronization,constants,triggerVarInde
 			included = included+1;
 			stretchData(included).emg = emgData(stretches(stretchInits(i))-constants.preTriggerEpoc:stretches(stretchInits(i))-constants.preTriggerEpoc+constants.visualizationEpoc,:);
 			stretchData(included).trigger = triggerData(stretches(stretchInits(i))-constants.preTriggerEpoc:stretches(stretchInits(i))-constants.preTriggerEpoc+constants.visualizationEpoc);
+			stretchData(included).samplingFreq = samplingFreq;
 		end
     end
-
+	
 end

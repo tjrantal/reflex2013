@@ -131,6 +131,13 @@ for f = 1:length(fileList);%:1:length(fileList); %Go through files in a director
 	set(overlayFig,'currentaxes',sAxis(6));
 	plot(samplingInstants,trigMean(visualizeEpoc),'k-','linewidth',3);					
 	set(gca,'xlim',[-50 100]);
+	if exist ('OCTAVE_VERSION', 'builtin') %OCTAVE
+		set(overlayFig,'visible','on');
+		print('-dpng','-r300','-S2400,2400',[constants.visualizationFolder constants.separator fileList(f).name(1:length(fileList(f).name)-4) constants.separator fName '_mean_contact_running' '.png']);
+	else	%MATLAB
+		print('-dpng','-r300',[constants.visualizationFolder constants.separator fileList(f).name(1:length(fileList(f).name)-4) constants.separator fName  '_mean_contact_running' '.png']);
+	end
+	close(overlayFig);
 
 	clear data;
 end

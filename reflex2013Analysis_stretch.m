@@ -83,7 +83,7 @@ constants.forceLevels = {'Passive','10% MVC','50% MVC'};
 fileList = dir([constants.dataFolder  separator '*.' constants.dataFileSuffix]);
 %keyboard
 stretchData = struct();
-for f = 3%1:length(fileList);%:1:length(fileList); %Go through files in a directory
+for f = 1:length(fileList);%:1:length(fileList); %Go through files in a directory
 	%Reading the protocol text file
 	filename = [constants.dataFolder separator fileList(f).name];
 	%keyboard
@@ -94,6 +94,7 @@ for f = 3%1:length(fileList);%:1:length(fileList); %Go through files in a direct
         mkdir([constants.visualizationFolder constants.separator fileList(f).name(1:length(fileList(f).name)-4)]);
     end
 	fName = fileList(f).name(1:length(fileList(f).name)-4);
+
 	%Go through all stretches
 	for s = 1:9 %Go through different stretches
 		%Analyse slow
@@ -101,6 +102,10 @@ for f = 3%1:length(fileList);%:1:length(fileList); %Go through files in a direct
 		%Plot test figure
 		overlayFig = figure;
 		set(overlayFig,'position',[10 10 600 600],'visible','on');
+		samplingFreq =meanTrace.fast.samplingFreq;
+		visualizeEpoc = data.constants.preTriggerEpoc-int32(samplingFreq*0.05):data.constants.preTriggerEpoc+int32(samplingFreq*0.15);
+		samplingInstants = linspace(-50,150,length(visualizeEpoc));
+		
 		%create subplots
 		for p = 1:6
 			sAxis(p) = subplot(3,2,p);
@@ -108,14 +113,31 @@ for f = 3%1:length(fileList);%:1:length(fileList); %Go through files in a direct
 		end
 		for p = 1:size(meanTrace.fast.emg,2)
 			set(overlayFig,'currentaxes',sAxis(p));
-			plot(meanTrace.fast.emg(:,p),'k-','linewidth',3)
+			plot(samplingInstants,meanTrace.fast.emg(visualizeEpoc,p),'k-','linewidth',3)
+			set(gca,'xlim',[samplingInstants(1) samplingInstants(length(samplingInstants))]);
+			if p < 5
+				title([constants.trialGroups{s} ' ' constants.triggerSignalVarsNames{p+2}]);
+				xlabel('[ms]');
+			end
 		end
 		set(overlayFig,'currentaxes',sAxis(6));
-		plot(meanTrace.fast.trigger,'k-','linewidth',3);					
+		plot(samplingInstants,meanTrace.fast.trigger(visualizeEpoc),'k-','linewidth',3);
+		if exist ('OCTAVE_VERSION', 'builtin') %OCTAVE
+			set(overlayFig,'visible','on');
+			print('-dpng','-r300','-S2400,2400',[constants.visualizationFolder constants.separator fileList(f).name(1:length(fileList(f).name)-4) constants.separator fName '_' constants.trialGroups{s} '_fast' '.png']);
+		else	%MATLAB
+			print('-dpng','-r300',[constants.visualizationFolder constants.separator fileList(f).name(1:length(fileList(f).name)-4) constants.separator fName  '_' constants.trialGroups{s} '_fast' '.png']);
+		end
+		close(overlayFig);
+		
 		if isfield(meanTrace,'slow') % check if slow exists
 			%Plot test figure
 			overlayFig = figure;
 			set(overlayFig,'position',[10 10 600 600],'visible','on');
+			samplingFreq =meanTrace.slow.samplingFreq;
+			visualizeEpoc = data.constants.preTriggerEpoc-int32(samplingFreq*0.05):data.constants.preTriggerEpoc+int32(samplingFreq*0.15);
+			samplingInstants = linspace(-50,150,length(visualizeEpoc));
+			
 			%create subplots
 			for p = 1:6
 				sAxis(p) = subplot(3,2,p);
@@ -123,10 +145,22 @@ for f = 3%1:length(fileList);%:1:length(fileList); %Go through files in a direct
 			end
 			for p = 1:size(meanTrace.slow.emg,2)
 				set(overlayFig,'currentaxes',sAxis(p));
-				plot(meanTrace.slow.emg(:,p),'k-','linewidth',3)
+				plot(samplingInstants,meanTrace.slow.emg(visualizeEpoc,p),'k-','linewidth',3)
+				set(gca,'xlim',[samplingInstants(1) samplingInstants(length(samplingInstants))]);
+				if p < 5
+					title([constants.trialGroups{s} ' ' constants.triggerSignalVarsNames{p+2}]);
+					xlabel('[ms]');
+				end
 			end
 			set(overlayFig,'currentaxes',sAxis(6));
-			plot(meanTrace.slow.trigger,'k-','linewidth',3);					
+			plot(samplingInstants,meanTrace.slow.trigger(visualizeEpoc),'k-','linewidth',3);
+			if exist ('OCTAVE_VERSION', 'builtin') %OCTAVE
+				set(overlayFig,'visible','on');
+				print('-dpng','-r300','-S2400,2400',[constants.visualizationFolder constants.separator fileList(f).name(1:length(fileList(f).name)-4) constants.separator fName '_' constants.trialGroups{s} '_slow' '.png']);
+			else	%MATLAB
+				print('-dpng','-r300',[constants.visualizationFolder constants.separator fileList(f).name(1:length(fileList(f).name)-4) constants.separator fName  '_' constants.trialGroups{s} '_slow' '.png']);
+			end
+			close(overlayFig);			
 		end
 
 

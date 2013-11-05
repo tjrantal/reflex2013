@@ -8,14 +8,18 @@ function meanStretch = getMeanStretch(stretch)
 	end
 		%Plot meanTraces
 	tempMean = mean(tempData,3);
-	%Remove possible DC offset
+	%Remove possible DC offset and low freq noise
+	samplingFreq = stretch.fast.stretchData(1).samplingFreq;
+	disp(num2str(samplingFreq));
+	nyquist = samplingFreq/2.0;
+    [b,a] = butter(2,[5.0/nyquist 450.0/nyquist]);
 	for p = 1:size(tempMean,2)
-		tempMean(:,p) = tempMean(:,p)-mean(tempMean(:,p));
+		tempMean(:,p) = filtfilt(b,a,tempMean(:,p));
 	end
 
 	meanStretch.fast.emg = tempMean;
 	meanStretch.fast.trigger = mean(tempTrig,2);
-	meanStretch.fast.samplingFreq = stretch.fast.stretchData(1).samplingFreq;
+	meanStretch.fast.samplingFreq = samplingFreq;
 	if isfield(stretch,'slow') % check if slow exists
 			if isfield(stretch.slow,'stretchData')
 				tempData = zeros(size(stretch.slow.stretchData(1).emg,1),size(stretch.slow.stretchData(1).emg,2),length(stretch.slow.stretchData));
@@ -26,14 +30,17 @@ function meanStretch = getMeanStretch(stretch)
 				end
 					%Plot meanTraces
 				tempMean = mean(tempData,3);
-				%Remove possible DC offset
+				%Remove possible DC offset and low freq noise
+				samplingFreq = stretch.slow.stretchData(1).samplingFreq;
+				disp(num2str(samplingFreq));
+				nyquist = samplingFreq/2.0;
+				[b,a] = butter(2,[5.0/nyquist 450.0/nyquist]);
 				for p = 1:size(tempMean,2)
-					tempMean(:,p) = tempMean(:,p)-mean(tempMean(:,p));
+					tempMean(:,p) = filtfilt(b,a,tempMean(:,p));
 				end
-
 				meanStretch.slow.emg = tempMean;
 				meanStretch.slow.trigger = mean(tempTrig,2);
-				meanStretch.slow.samplingFreq = stretch.slow.stretchData(1).samplingFreq;
+				meanStretch.slow.samplingFreq = samplingFreq;
 			end
 		end
 end

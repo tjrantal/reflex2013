@@ -111,19 +111,26 @@ for f = 1:length(fileList);%:1:length(fileList); %Go through files in a director
 	plotMean = mean(tempData,3);
 	%Remove possible DC offset and low frequency noise
 	%Filter the triggerdata
-	nyquist = data.runData(1).samplingFreq/2.0;
+	samplingFreq = data.runData(1).samplingFreq;
+	disp(num2str(samplingFreq));
+	nyquist = samplingFreq/2.0;
     [b,a] = butter(2,[5.0/nyquist 450.0/nyquist]);
 	for p = 1:size(plotMean,2)
 		plotMean(:,p) = filtfilt(b,a,plotMean(:,p));
 	end
 	plotMean = sqrt(plotMean.^2);
 	trigMean = mean(tempTrig,2);
+	visualizeEpoc = data.constants.preTriggerEpoc-int32(samplingFreq*0.05):data.constants.preTriggerEpoc+int32(samplingFreq*0.1);
+	samplingInstants = linspace(-50,100,length(visualizeEpoc));
 	for p = 1:size(data.runData(1).emg,2)
 		set(overlayFig,'currentaxes',sAxis(p));
-		plot(plotMean(data.constants.preTriggerEpoc:data.constants.preTriggerEpoc+int32(nyquist*2.0*0.1),p),'k-','linewidth',3)
+		plot(samplingInstants,plotMean(visualizeEpoc,p),'k-','linewidth',3)
+		set(gca,'xlim',[-50 100]);
+		
 	end
 	set(overlayFig,'currentaxes',sAxis(6));
-	plot(trigMean(data.constants.preTriggerEpoc:data.constants.preTriggerEpoc+int32(nyquist*2.0*0.1)),'k-','linewidth',3);					
+	plot(samplingInstants,trigMean(visualizeEpoc),'k-','linewidth',3);					
+	set(gca,'xlim',[-50 100]);
 
 	clear data;
 end

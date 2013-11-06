@@ -202,7 +202,7 @@ for f = 1:length(fileList);%:1:length(fileList); %Go through files in a director
 				%Highlight analyzed epochs
 					reflexEpoc = data.constants.preTriggerEpoc+int32(samplingFreq*(numericalResults(p).latency/1000.0)):data.constants.preTriggerEpoc+int32(samplingFreq*(numericalResults(p).latency/1000.0))+int32(samplingFreq*0.02)-1;
 					reflexInstants = linspace(numericalResults(p).latency,numericalResults(p).latency+20,length(reflexEpoc));
-					plot(reflexInstants,meanTrace.fast.emg(reflexEpoc,p),'r-','linewidth',5)
+					plot(reflexInstants,meanTrace.slow.emg(reflexEpoc,p),'r-','linewidth',5)
 				end
 				if p < 5
 					title([constants.trialGroups{s} ' ' constants.triggerSignalVarsNames{p+2}]);

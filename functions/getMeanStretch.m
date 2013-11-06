@@ -10,7 +10,7 @@ function meanStretch = getMeanStretch(stretch)
 	tempMean = mean(tempData,3);
 	%Remove possible DC offset and low freq noise
 	samplingFreq = stretch.fast.stretchData(1).samplingFreq;
-	disp(num2str(samplingFreq));
+	%disp(num2str(samplingFreq));
 	nyquist = samplingFreq/2.0;
     [b,a] = butter(2,[5.0/nyquist 450.0/nyquist]);
 	for p = 1:size(tempMean,2)
@@ -32,7 +32,7 @@ function meanStretch = getMeanStretch(stretch)
 				tempMean = mean(tempData,3);
 				%Remove possible DC offset and low freq noise
 				samplingFreq = stretch.slow.stretchData(1).samplingFreq;
-				disp(num2str(samplingFreq));
+				%disp(num2str(samplingFreq));
 				nyquist = samplingFreq/2.0;
 				[b,a] = butter(2,[5.0/nyquist 450.0/nyquist]);
 				for p = 1:size(tempMean,2)

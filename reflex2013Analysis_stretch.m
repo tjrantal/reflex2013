@@ -83,6 +83,16 @@ constants.forceLevels = {'Passive','10% MVC','50% MVC'};
 fileList = dir([constants.dataFolder  separator '*.' constants.dataFileSuffix]);
 %keyboard
 stretchData = struct();
+
+resultFile = fopen('StretchResults.xls','w');	%Open a file for writing the results to
+%print the header
+fprintf(resultFile,"FName\t");
+for i = 1:12
+		fprintf(resultFile,"condition\tlatency [ms]\tinitial 5 ms RMS [mV]\tlast 15 ms RMS [mV]\treflex 20 ms RMS [mV]\t");
+end
+fprintf(resultFile,"\n");
+
+
 for f = 1:length(fileList);%:1:length(fileList); %Go through files in a directory
 	%Reading the protocol text file
 	filename = [constants.dataFolder separator fileList(f).name];
@@ -94,17 +104,34 @@ for f = 1:length(fileList);%:1:length(fileList); %Go through files in a director
         mkdir([constants.visualizationFolder constants.separator fileList(f).name(1:length(fileList(f).name)-4)]);
     end
 	fName = fileList(f).name(1:length(fileList(f).name)-4);
-
+	fprintf(resultFile,[fName '\t']);
+	
 	%Go through all stretches
 	for s = 1:9 %Go through different stretches
 		%Analyse slow
 		meanTrace = getMeanStretch(data.stretchData(s));
+		
+		%Numerical analysis
+		parameters = struct();
+		parameters.trigger = data.constants.preTriggerEpoc;
+		parameters.samplingFreq = meanTrace.fast.samplingFreq;
+		numericalResults = analyzeStretch(meanTrace.fast.emg,parameters);
+		fprintf(resultFile,"%s\t%f\t%f\t%f\t%f\t", ...
+			[constants.trialGroups{s} '_fast'] ...
+			,numericalResults(1).latency ...
+			,numericalResults(1).first5 ...
+			,numericalResults(1).last15 ...
+			,numericalResults(1).ms20 ...
+			);
+		%Numerical analysis done	
+		
 		%Plot test figure
 		overlayFig = figure;
 		set(overlayFig,'position',[10 10 600 600],'visible','on');
 		samplingFreq =meanTrace.fast.samplingFreq;
 		visualizeEpoc = data.constants.preTriggerEpoc-int32(samplingFreq*0.05):data.constants.preTriggerEpoc+int32(samplingFreq*0.15);
 		samplingInstants = linspace(-50,150,length(visualizeEpoc));
+		
 		
 		%create subplots
 		for p = 1:6
@@ -115,6 +142,12 @@ for f = 1:length(fileList);%:1:length(fileList); %Go through files in a director
 			set(overlayFig,'currentaxes',sAxis(p));
 			plot(samplingInstants,meanTrace.fast.emg(visualizeEpoc,p),'k-','linewidth',3)
 			set(gca,'xlim',[samplingInstants(1) samplingInstants(length(samplingInstants))]);
+			if p <=3 && ~isnan(numericalResults(p).latency)	%Plot timing
+			%Highlight analyzed epochs
+				reflexEpoc = data.constants.preTriggerEpoc+int32(samplingFreq*(numericalResults(p).latency/1000.0)):data.constants.preTriggerEpoc+int32(samplingFreq*(numericalResults(p).latency/1000.0))+int32(samplingFreq*0.02)-1;
+				reflexInstants = linspace(numericalResults(p).latency,numericalResults(p).latency+20,length(reflexEpoc));
+				plot(reflexInstants,meanTrace.fast.emg(reflexEpoc,p),'r-','linewidth',5)
+			end
 			if p < 5
 				title([constants.trialGroups{s} ' ' constants.triggerSignalVarsNames{p+2}]);
 				xlabel('[ms]');
@@ -131,6 +164,20 @@ for f = 1:length(fileList);%:1:length(fileList); %Go through files in a director
 		close(overlayFig);
 		
 		if isfield(meanTrace,'slow') % check if slow exists
+			%Numerical analysis
+			parameters = struct();
+			parameters.trigger = data.constants.preTriggerEpoc;
+			parameters.samplingFreq =meanTrace.slow.samplingFreq;
+			numericalResults = analyzeStretch(meanTrace.slow.emg,parameters);
+			fprintf(resultFile,"%s\t%f\t%f\t%f\t%f\t", ...
+				[constants.trialGroups{s} '_slow'] ...
+				,numericalResults(1).latency ...
+				,numericalResults(1).first5 ...
+				,numericalResults(1).last15 ...
+				,numericalResults(1).ms20 ...
+				);	
+			%Numerical analysis done	
+
 			%Plot test figure
 			overlayFig = figure;
 			set(overlayFig,'position',[10 10 600 600],'visible','on');
@@ -138,6 +185,10 @@ for f = 1:length(fileList);%:1:length(fileList); %Go through files in a director
 			visualizeEpoc = data.constants.preTriggerEpoc-int32(samplingFreq*0.05):data.constants.preTriggerEpoc+int32(samplingFreq*0.15);
 			samplingInstants = linspace(-50,150,length(visualizeEpoc));
 			
+			%Highlight analyzed epochs
+			reflexEpoc = data.constants.preTriggerEpoc+int32(samplingFreq*(numericalResults(1).latency/1000.0)):data.constants.preTriggerEpoc+int32(samplingFreq*(numericalResults(1).latency/1000.0))+int32(samplingFreq*0.02)-1;
+			reflexInstants = linspace(numericalResults(1).latency,numericalResults(1).latency+20,length(reflexEpoc));
+		
 			%create subplots
 			for p = 1:6
 				sAxis(p) = subplot(3,2,p);
@@ -147,6 +198,12 @@ for f = 1:length(fileList);%:1:length(fileList); %Go through files in a director
 				set(overlayFig,'currentaxes',sAxis(p));
 				plot(samplingInstants,meanTrace.slow.emg(visualizeEpoc,p),'k-','linewidth',3)
 				set(gca,'xlim',[samplingInstants(1) samplingInstants(length(samplingInstants))]);
+				if p <=3 && ~isnan(numericalResults(p).latency)	%Plot timing
+				%Highlight analyzed epochs
+					reflexEpoc = data.constants.preTriggerEpoc+int32(samplingFreq*(numericalResults(p).latency/1000.0)):data.constants.preTriggerEpoc+int32(samplingFreq*(numericalResults(p).latency/1000.0))+int32(samplingFreq*0.02)-1;
+					reflexInstants = linspace(numericalResults(p).latency,numericalResults(p).latency+20,length(reflexEpoc));
+					plot(reflexInstants,meanTrace.fast.emg(reflexEpoc,p),'r-','linewidth',5)
+				end
 				if p < 5
 					title([constants.trialGroups{s} ' ' constants.triggerSignalVarsNames{p+2}]);
 					xlabel('[ms]');
@@ -166,8 +223,8 @@ for f = 1:length(fileList);%:1:length(fileList); %Go through files in a director
 
 
 	end
+	fprintf(resultFile,"\n");
 	clear data;
 end
-%keyboard;
-%save data here
+fclose(resultFile);
 

@@ -178,7 +178,7 @@ for f = 3%1:length(fileList);%:1:length(fileList); %Go through files in a direct
 		for p = 1:3
 			disp(['after ' num2str(p) ' lat ' num2str(manualAdjustments.currentInit(p))]);
 		end
-		keyboard;
+
 		numericalResults = reAnalyzeStretch(meanTrace.fast.emg,parameters,manualAdjustments);
 		%Print results
 		fprintf(resultFile,"%s\t%f\t%f\t%f\t%f\t", ...
@@ -228,8 +228,9 @@ for f = 3%1:length(fileList);%:1:length(fileList); %Go through files in a direct
 			manualAdjustments.data = meanTrace.slow.emg(visualizeEpoc,:);
 			manualAdjustments.samplingInstants = samplingInstants;
 			for p = 1:length(numericalResults)
-				if ~isnan(numericalResults(p).latency)
-					manualAdjustments.currentInit(p) = numericalResults(p).latency+int32(parameters.samplingFreq*0.05);
+				if ~isnan(numericalResults(p).reflexInitIndex)
+					manualAdjustments.currentInit(p) = numericalResults(p).reflexInitIndex+int32(parameters.samplingFreq*0.05);
+					disp(['prior ' num2str(p) ' lat ' num2str(manualAdjustments.currentInit(p)) ' orig ' num2str(numericalResults(p).reflexInitIndex) ' addition ' num2str(int32(parameters.samplingFreq*0.05))]);
 				else
 					manualAdjustments.currentInit(p) = NaN;
 				end

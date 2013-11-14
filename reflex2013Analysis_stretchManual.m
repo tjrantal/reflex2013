@@ -96,7 +96,7 @@ fprintf(resultFile,"\n");
 
 
 graphics_toolkit fltk;
-for f = 1%:length(fileList);%:1:length(fileList); %Go through files in a directory
+for f = 1:length(fileList);%:1:length(fileList); %Go through files in a directory
 	%Reading the protocol text file
 	filename = [constants.dataFolder separator fileList(f).name];
 	%keyboard

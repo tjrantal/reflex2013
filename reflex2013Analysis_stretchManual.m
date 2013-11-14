@@ -93,6 +93,8 @@ end
 fprintf(resultFile,"\n");
 
 
+
+
 for f = 1:length(fileList);%:1:length(fileList); %Go through files in a directory
 	%Reading the protocol text file
 	filename = [constants.dataFolder separator fileList(f).name];
@@ -107,6 +109,7 @@ for f = 1:length(fileList);%:1:length(fileList); %Go through files in a director
 	fprintf(resultFile,[fName '\t']);
 	
 	%Go through all stretches
+	global manualAdjustments;
 	for s = 1:9 %Go through different stretches
 		%Analyse slow
 		meanTrace = getMeanStretch(data.stretchData(s));
@@ -134,8 +137,14 @@ for f = 1:length(fileList);%:1:length(fileList); %Go through files in a director
 		
 		
 		%create subplots
-		for p = 1:6
-			sAxis(p) = subplot(3,2,p);
+		manualAdjustments = struct();
+		manualAdjustments.epoch = length(visualizeEpoc);
+		manualAdjustments.data = meanTrace.fast.emg;
+		plotGeometry = [3,2];
+		manualAdjustments.plotGeometry = plotGeometry;
+		for p = 1:plotGeometry(1)*plotGeometry(2);
+			sAxis(p) = subplot(plotGeometry(1),plotGeometry(2),p);
+			manualAdjustments.sAx(p) = sAxis(p);
 			hold on;
 		end
 		for p = 1:size(meanTrace.fast.emg,2)
@@ -146,15 +155,27 @@ for f = 1:length(fileList);%:1:length(fileList); %Go through files in a director
 			%Highlight analyzed epochs
 				reflexEpoc = data.constants.preTriggerEpoc+int32(samplingFreq*(numericalResults(p).latency/1000.0)):data.constants.preTriggerEpoc+int32(samplingFreq*(numericalResults(p).latency/1000.0))+int32(samplingFreq*0.02)-1;
 				reflexInstants = linspace(numericalResults(p).latency,numericalResults(p).latency+20,length(reflexEpoc));
-				plot(reflexInstants,meanTrace.fast.emg(reflexEpoc,p),'r-','linewidth',5)
+				manualAdjustments.overlayTrace(p) =  plot(reflexInstants,meanTrace.fast.emg(reflexEpoc,p),'r-','linewidth',5)
 			end
 			if p < 5
 				title([constants.trialGroups{s} ' ' constants.triggerSignalVarsNames{p+2}]);
 				xlabel('[ms]');
 			end
 		end
-		set(overlayFig,'currentaxes',sAxis(6));
+		set(overlayFig,'currentaxes',sAxis(plotGeometry(1)*plotGeometry(2)));
 		plot(samplingInstants,meanTrace.fast.trigger(visualizeEpoc),'k-','linewidth',3);
+		
+		%Adjust results manually at this point
+
+		set(overlayFig,'visible','on','WindowButtonUpFcn',@mouseLeftClick);
+		disp('Callback set');
+		uiwait(testF);
+		dbquit;
+		%Manual adjustments done
+		%Print results
+
+		
+		
 		if exist ('OCTAVE_VERSION', 'builtin') %OCTAVE
 			set(overlayFig,'visible','on');
 			print('-dpng','-r300','-S2400,2400',[constants.visualizationFolder constants.separator fileList(f).name(1:length(fileList(f).name)-4) constants.separator fName '_' constants.trialGroups{s} '_fast' '.png']);
@@ -190,8 +211,8 @@ for f = 1:length(fileList);%:1:length(fileList); %Go through files in a director
 			reflexInstants = linspace(numericalResults(1).latency,numericalResults(1).latency+20,length(reflexEpoc));
 		
 			%create subplots
-			for p = 1:6
-				sAxis(p) = subplot(3,2,p);
+			for p = 1:plotGeometry(1)*plotGeometry(2);
+				sAxis(p) = subplot(plotGeometry(1),plotGeometry(2),p);
 				hold on;
 			end
 			for p = 1:size(meanTrace.slow.emg,2)
@@ -209,8 +230,13 @@ for f = 1:length(fileList);%:1:length(fileList); %Go through files in a director
 					xlabel('[ms]');
 				end
 			end
-			set(overlayFig,'currentaxes',sAxis(6));
+			set(overlayFig,'currentaxes',sAxis(plotGeometry(1)*plotGeometry(2)));
 			plot(samplingInstants,meanTrace.slow.trigger(visualizeEpoc),'k-','linewidth',3);
+			%Adjust results manually at this point
+		
+			%Manual adjustments done
+			%Print results
+
 			if exist ('OCTAVE_VERSION', 'builtin') %OCTAVE
 				set(overlayFig,'visible','on');
 				print('-dpng','-r300','-S2400,2400',[constants.visualizationFolder constants.separator fileList(f).name(1:length(fileList(f).name)-4) constants.separator fName '_' constants.trialGroups{s} '_slow' '.png']);

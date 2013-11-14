@@ -19,10 +19,11 @@ function mouseLeftClick(objH,evt)
 		%Get the current point from the plot clicked on
         point = round(get(sAx(currentAxisIndex),'CurrentPoint'));
 		%Set the latency so that it can be read in the main analysis function
+		%keyboard;
 		currentInit = max([1 find(samplingInstants >= point(1),1,'first')]);	%Cannot have init less than 1 
 		manualAdjustments.currentInit(currentAxisIndex) = currentInit;
 		endEpoch = min([currentInit+epoch-1 size(data,1)]); %Prevent trying to plot out of bounds
 		plotEpoch = currentInit:endEpoch;
-		set(overlayTrace(currentAxisIndex),'XData',samplingInstants(plotEpoch) ,'YData',data(plotEpoch,currentAxisIndex)); %N.B. row, column and index differs by 1!!!
+		set(overlayTrace(currentAxisIndex),'XData',samplingInstants(plotEpoch) ,'YData',data(plotEpoch,currentAxisIndex),'color',[0 1 0]); %N.B. row, column and index differs by 1!!!
 		drawnow();
 endfunction

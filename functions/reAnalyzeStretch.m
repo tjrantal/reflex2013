@@ -6,7 +6,7 @@ function results = reAnalyzeStretch(dataIn,parameters,manualAdjustments)
 		bgSTDev = std(rectified(parameters.trigger:parameters.trigger+int32(0.030*parameters.samplingFreq)-1));
 		%Use the manually determined init
 		if ~isnan(manualAdjustments.currentInit(i))
-			reflexInitIndex = manualAdjustments.currentInit(i)-int32(parameters.samplingFreq*0.05);
+			reflexInitIndex = double(manualAdjustments.currentInit(i)-int32(parameters.samplingFreq*0.05));
 		else
 			reflexInitIndex = [];
 		end
@@ -22,4 +22,4 @@ function results = reAnalyzeStretch(dataIn,parameters,manualAdjustments)
 			results(i).last15 = NaN;
 		end
 	end
-endcc
+end

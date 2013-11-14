@@ -95,7 +95,7 @@ fprintf(resultFile,"\n");
 
 
 graphics_toolkit fltk;
-for f = 1:length(fileList);%:1:length(fileList); %Go through files in a directory
+for f = 3%1:length(fileList);%:1:length(fileList); %Go through files in a directory
 	%Reading the protocol text file
 	filename = [constants.dataFolder separator fileList(f).name];
 	%keyboard
@@ -131,16 +131,18 @@ for f = 1:length(fileList);%:1:length(fileList); %Go through files in a director
 		
 		%create subplots
 		manualAdjustments = struct();
-		for p = 1:length(numericalResults)
-			if ~isnan(numericalResults.latency(p))
-				manualAdjustmets.currentInit(p) = numericalResults.latency(p)+int32(parameters.samplingFreq*0.05);
-			else
-				manualAdjustmets.currentInit(p) = NaN;
-			end
-		end
 		manualAdjustments.epoch = int32(samplingFreq*0.02);
 		manualAdjustments.data = meanTrace.fast.emg(visualizeEpoc,:);
 		manualAdjustments.samplingInstants = samplingInstants;
+		for p = 1:length(numericalResults)
+			if ~isnan(numericalResults(p).reflexInitIndex)
+				manualAdjustments.currentInit(p) = numericalResults(p).reflexInitIndex+int32(parameters.samplingFreq*0.05);
+				disp(['prior ' num2str(p) ' lat ' num2str(manualAdjustments.currentInit(p)) ' orig ' num2str(numericalResults(p).reflexInitIndex) ' addition ' num2str(int32(parameters.samplingFreq*0.05))]);
+			else
+				manualAdjustments.currentInit(p) = NaN;
+			end
+		end
+		
 		plotGeometry = [3,2];
 		manualAdjustments.plotGeometry = plotGeometry;
 		for p = 1:plotGeometry(1)*plotGeometry(2);
@@ -167,11 +169,16 @@ for f = 1:length(fileList);%:1:length(fileList); %Go through files in a director
 		plot(samplingInstants,meanTrace.fast.trigger(visualizeEpoc),'k-','linewidth',3);
 		
 		%Adjust results manually at this point
+		waitButton = waitbar(0,'Done','position',[610 610 200 50]);
 		set(overlayFig,'visible','on','WindowButtonUpFcn',@mouseLeftClick);
 		disp('Callback set');
-		uiwait(overlayFig);
-		dbquit;
+		waitfor(waitButton);
+		disp('returned from callback');
 		%Manual adjustments done
+		for p = 1:3
+			disp(['after ' num2str(p) ' lat ' num2str(manualAdjustments.currentInit(p))]);
+		end
+		keyboard;
 		numericalResults = reAnalyzeStretch(meanTrace.fast.emg,parameters,manualAdjustments);
 		%Print results
 		fprintf(resultFile,"%s\t%f\t%f\t%f\t%f\t", ...
@@ -217,16 +224,16 @@ for f = 1:length(fileList);%:1:length(fileList); %Go through files in a director
 		
 			%create subplots
 			manualAdjustments = struct();
-			for p = 1:length(numericalResults)
-				if ~isnan(numericalResults.latency(p))
-					manualAdjustmets.currentInit(p) = numericalResults.latency(p)+int32(parameters.samplingFreq*0.05);
-				else
-					manualAdjustmets.currentInit(p) = NaN;
-				end
-			end
 			manualAdjustments.epoch = int32(samplingFreq*0.02);
 			manualAdjustments.data = meanTrace.slow.emg(visualizeEpoc,:);
 			manualAdjustments.samplingInstants = samplingInstants;
+			for p = 1:length(numericalResults)
+				if ~isnan(numericalResults(p).latency)
+					manualAdjustments.currentInit(p) = numericalResults(p).latency+int32(parameters.samplingFreq*0.05);
+				else
+					manualAdjustments.currentInit(p) = NaN;
+				end
+			end
 			plotGeometry = [3,2];
 			manualAdjustments.plotGeometry = plotGeometry;
 			for p = 1:plotGeometry(1)*plotGeometry(2);
@@ -243,7 +250,7 @@ for f = 1:length(fileList);%:1:length(fileList); %Go through files in a director
 				%Highlight analyzed epochs
 					reflexEpoc = data.constants.preTriggerEpoc+int32(samplingFreq*(numericalResults(p).latency/1000.0)):data.constants.preTriggerEpoc+int32(samplingFreq*(numericalResults(p).latency/1000.0))+int32(samplingFreq*0.02)-1;
 					reflexInstants = linspace(numericalResults(p).latency,numericalResults(p).latency+20,length(reflexEpoc));
-					manualAdjustments.overlayTrace(p) = plot(reflexInstants,meanTrace.slow.emg(reflexEpoc,p),'r-','linewidth',5)
+					manualAdjustments.overlayTrace(p) = plot(reflexInstants,meanTrace.slow.emg(reflexEpoc,p),'r-','linewidth',5);
 				end
 				if p < 5
 					title([constants.trialGroups{s} ' ' constants.triggerSignalVarsNames{p+2}]);
@@ -253,10 +260,11 @@ for f = 1:length(fileList);%:1:length(fileList); %Go through files in a director
 			set(overlayFig,'currentaxes',sAxis(plotGeometry(1)*plotGeometry(2)));
 			plot(samplingInstants,meanTrace.slow.trigger(visualizeEpoc),'k-','linewidth',3);
 			%Adjust results manually at this point
+			waitButton = waitbar(0,'Done','position',[610 610 200 50]);
 			set(overlayFig,'visible','on','WindowButtonUpFcn',@mouseLeftClick);
 			disp('Callback set');
-			uiwait(overlayFig);
-			dbquit;
+			waitfor(waitButton);
+			disp('returned from callback');
 			%Manual adjustments done
 			numericalResults = reAnalyzeStretch(meanTrace.slow.emg,parameters,manualAdjustments);
 			%Print results

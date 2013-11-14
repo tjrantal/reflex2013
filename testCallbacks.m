@@ -34,3 +34,5 @@ set(testF,'visible','on');
 set(testF,'WindowButtonUpFcn',@mouseLeftClickTest);  %%LiveWire init and setting points are handled with callbacks
 %set(gcf,'WindowButtonMotionFcn',@mouseMoved); %Draw vertical line on the figure
 disp('Callback set');
+uiwait(testF);
+disp('All done');

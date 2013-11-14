@@ -8,11 +8,12 @@ function mouseLeftClickTest(objH,evt)
 		for i = 1:2
 			relativePosition(i) = figCoordinate(i)/figPosition(i+2);
 		end
+		relativePosition
 		%Figure out on which subplot the cursor must have been
-		row = ceil((1-relativePosition(1))*plotGeometry(1));
-		column = ceil(relativePosition(2)*plotGeometry(2));
+		column = ceil((relativePosition(1))*plotGeometry(2))
+		row = ceil((1-relativePosition(2))*plotGeometry(1))
 		currentAxisIndex = (row-1)*plotGeometry(2)+column;
-		
+		currentAxisIndex
 
 			%currentAxisIndex = find(sAx == objH,1,'first');
 		

@@ -19,8 +19,8 @@ yLims = squeeze(tempLims(2,:));
 xLims = squeeze(tempLims(1,:));
 %test subplots with callbacks
 plotGeometry = [2,2];
-for i = 1:4
-	sAx(i) = subplot(2,2,i);
+for i = 1:plotGeometry(1)*plotGeometry(2)
+	sAx(i) = subplot(plotGeometry(1),plotGeometry(2),i);
 	plot(data(1,:),data(2,:),'k.','linestyle','none');
 	hold on;
 	overlayTrace(i) = plot(data(1,currentInit:currentInit+epoch-1),data(2,currentInit:currentInit+epoch-1),'r');

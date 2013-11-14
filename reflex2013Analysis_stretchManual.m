@@ -96,7 +96,7 @@ fprintf(resultFile,"\n");
 
 
 graphics_toolkit fltk;
-for f = 3%1:length(fileList);%:1:length(fileList); %Go through files in a directory
+for f = 1%:length(fileList);%:1:length(fileList); %Go through files in a directory
 	%Reading the protocol text file
 	filename = [constants.dataFolder separator fileList(f).name];
 	%keyboard
@@ -111,11 +111,11 @@ for f = 3%1:length(fileList);%:1:length(fileList); %Go through files in a direct
 	
 	%Go through all stretches
 	%check whether latencies have already been analyzed and load, if so
-	if [constants.latencyFolder separator fileList(f).name] == 0
+	if exist([constants.latencyFolder separator fileList(f).name]) == 0
 		latencies = struct();
 	else
 		%load pre-existing latencies
-		temp = load(constants.latencyFolder separator fileList(f).name);
+		temp = load([constants.latencyFolder separator fileList(f).name]);
 		latencies = temp.latencies;
 		clear temp;
 	end
@@ -151,7 +151,9 @@ for f = 3%1:length(fileList);%:1:length(fileList); %Go through files in a direct
 		for p = 1:length(numericalResults)
 			if ~isnan(numericalResults(p).reflexInitIndex)
 				manualAdjustments.currentInit(p) = numericalResults(p).reflexInitIndex+int32(parameters.samplingFreq*0.05);
-				disp(['prior ' num2str(p) ' lat ' num2str(manualAdjustments.currentInit(p)) ' orig ' num2str(numericalResults(p).reflexInitIndex) ' addition ' num2str(int32(parameters.samplingFreq*0.05))]);
+				if 0	%debugging
+					disp(['prior ' num2str(p) ' lat ' num2str(manualAdjustments.currentInit(p)) ' orig ' num2str(numericalResults(p).reflexInitIndex) ' addition ' num2str(int32(parameters.samplingFreq*0.05))]);
+				end
 			else
 				manualAdjustments.currentInit(p) = NaN;
 			end
@@ -189,8 +191,10 @@ for f = 3%1:length(fileList);%:1:length(fileList); %Go through files in a direct
 		waitfor(waitButton);
 		disp('returned from callback');
 		%Manual adjustments done
-		for p = 1:3
-			disp(['after ' num2str(p) ' lat ' num2str(manualAdjustments.currentInit(p))]);
+		if 0	%debugging
+			for p = 1:3
+				disp(['after ' num2str(p) ' lat ' num2str(manualAdjustments.currentInit(p))]);
+			end
 		end
 		latencies(s).fast.manualAdjustments = manualAdjustments;
 		numericalResults = reAnalyzeStretch(meanTrace.fast.emg,parameters,manualAdjustments);
@@ -248,7 +252,9 @@ for f = 3%1:length(fileList);%:1:length(fileList); %Go through files in a direct
 			for p = 1:length(numericalResults)
 				if ~isnan(numericalResults(p).reflexInitIndex)
 					manualAdjustments.currentInit(p) = numericalResults(p).reflexInitIndex+int32(parameters.samplingFreq*0.05);
-					disp(['prior ' num2str(p) ' lat ' num2str(manualAdjustments.currentInit(p)) ' orig ' num2str(numericalResults(p).reflexInitIndex) ' addition ' num2str(int32(parameters.samplingFreq*0.05))]);
+					if 0 %debugging
+						disp(['prior ' num2str(p) ' lat ' num2str(manualAdjustments.currentInit(p)) ' orig ' num2str(numericalResults(p).reflexInitIndex) ' addition ' num2str(int32(parameters.samplingFreq*0.05))]);
+					end
 				else
 					manualAdjustments.currentInit(p) = NaN;
 				end

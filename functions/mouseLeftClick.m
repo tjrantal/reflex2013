@@ -1,12 +1,12 @@
 function mouseLeftClick(objH,evt)
 	global manualAdjustments;
 		%Create local vars to make things easier
-		overlayTrace	=manualAdjustments.overlayTrace;
-		sAx				=manualAdjustments.sAx;
-		data 			=manualAdjustments.data;
-		epoch 			=manualAdjustments.epoch;
-		plotGeometry	=manualAdjustments.plotGeometry;
-		
+		overlayTrace		=manualAdjustments.overlayTrace;
+		sAx					=manualAdjustments.sAx;
+		data	 			=manualAdjustments.data;
+		epoch 				=manualAdjustments.epoch;
+		plotGeometry		=manualAdjustments.plotGeometry;
+		samplingInstants	=manualAdjustments.samplingInstants;
 		%Figure out which suplot was clicked on
 		figPosition = get(gcf,'position');
 		figCoordinate = get(gcf,'CurrentPoint');
@@ -19,10 +19,10 @@ function mouseLeftClick(objH,evt)
 		%Get the current point from the plot clicked on
         point = round(get(sAx(currentAxisIndex),'CurrentPoint'));
 		%Set the latency so that it can be read in the main analysis function
-		currentInit = max([1 point(1)]);	%Cannot have init less than 1 
+		currentInit = max([1 find(samplingInstants >= point(1),1,'first')]);	%Cannot have init less than 1 
 		manualAdjustments.currentInit(currentAxisIndex) = currentInit;
 		endEpoch = min([currentInit+epoch-1 size(data,1)]); %Prevent trying to plot out of bounds
 		plotEpoch = currentInit:endEpoch;
-		set(overlayTrace(currentAxisIndex),'XData',data(plotEpoch,1) ,'YData',data(plotEpoch,2)); %N.B. row, column and index differs by 1!!!
+		set(overlayTrace(currentAxisIndex),'XData',samplingInstants(plotEpoch) ,'YData',data(plotEpoch,currentAxisIndex)); %N.B. row, column and index differs by 1!!!
 		drawnow();
 endfunction

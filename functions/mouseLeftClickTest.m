@@ -22,8 +22,8 @@ function mouseLeftClickTest(objH,evt)
 		currentInit = max([1 find(data(1,:) >= point(1),1,'first')]);	%Cannot have init less than 1 
 		endEpoch = min([currentInit+epoch-1 size(data,2)]); %Prevent trying to plot out of bounds
 		plotEpoch = currentInit:endEpoch;
-		set(overlayTrace(currentAxisIndex),'XData',data(1,plotEpoch) ,'YData',data(2,plotEpoch)); %N.B. row, column and index differs by 1!!!
-		set(sAx(currentAxisIndex),'xlim',xLims,'ylim',yLims);
+		set(overlayTrace(currentAxisIndex),'XData',data(1,plotEpoch) ,'YData',data(2,plotEpoch),'color',[0 1 0]); %N.B. row, column and index differs by 1!!!
+		set(sAx(currentAxisIndex),'xlim',xLims,'ylim',yLimsplot);
 		%plot([point(1) point(1)],'YData',yLims,'g');
 		%plot(point(1),point(2),'r*');
         disp('Left Click');

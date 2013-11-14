@@ -40,6 +40,7 @@ constants.dataFileSuffix = 'mat';   %Note omit the . Used to search files from a
 constants.dataFolder =[constants.baseFolder separator 'analysis' separator 'stretches'];
 constants.resultsFolder =[constants.baseFolder separator 'analysis' separator 'results'];
 constants.visualizationFolder =[constants.baseFolder separator 'analysis' separator 'stretchVisualization'];
+constants.latencyFolder =[constants.baseFolder separator 'analysis' separator 'latencies'];
 
 %Hard coded trial names to find
 constants.trialGroups = { ...
@@ -109,31 +110,44 @@ for f = 3%1:length(fileList);%:1:length(fileList); %Go through files in a direct
 	fprintf(resultFile,[fName '\t']);
 	
 	%Go through all stretches
+	%check whether latencies have already been analyzed and load, if so
+	if [constants.latencyFolder separator fileList(f).name] == 0
+		latencies = struct();
+	else
+		%load pre-existing latencies
+		temp = load(constants.latencyFolder separator fileList(f).name);
+		latencies = temp.latencies;
+		clear temp;
+	end
 	global manualAdjustments;
 	for s = 1:9 %Go through different stretches
 		%Analyse slow
 		meanTrace = getMeanStretch(data.stretchData(s));
 		
 		%Numerical analysis
+		samplingFreq =meanTrace.fast.samplingFreq;
+		visualizeEpoc = data.constants.preTriggerEpoc-int32(samplingFreq*0.05):data.constants.preTriggerEpoc+int32(samplingFreq*0.15);
+		samplingInstants = linspace(-50,150,length(visualizeEpoc));
 		parameters = struct();
 		parameters.trigger = data.constants.preTriggerEpoc;
-		parameters.samplingFreq = meanTrace.fast.samplingFreq;
-		numericalResults = analyzeStretch(meanTrace.fast.emg,parameters);
-
+		parameters.samplingFreq = samplingFreq;		
+		if length(latencies) >= s && isfield(latencies(s),'fast')
+			manualAdjustments = latencies(s).fast.manualAdjustments;
+			numericalResults = reAnalyzeStretch(meanTrace.fast.emg,parameters,manualAdjustments);
+		else
+			manualAdjustments = struct();
+			manualAdjustments.epoch = int32(samplingFreq*0.02);
+			manualAdjustments.data = meanTrace.fast.emg(visualizeEpoc,:);
+			manualAdjustments.samplingInstants = samplingInstants;
+			numericalResults = analyzeStretch(meanTrace.fast.emg,parameters);
+		end
 		%Numerical analysis done	
 		
 		%Plot test figure
 		overlayFig = figure('__graphics_toolkit__','fltk','position',[10 10 600 600],'visible','off');
-		samplingFreq =meanTrace.fast.samplingFreq;
-		visualizeEpoc = data.constants.preTriggerEpoc-int32(samplingFreq*0.05):data.constants.preTriggerEpoc+int32(samplingFreq*0.15);
-		samplingInstants = linspace(-50,150,length(visualizeEpoc));
-		
 		
 		%create subplots
-		manualAdjustments = struct();
-		manualAdjustments.epoch = int32(samplingFreq*0.02);
-		manualAdjustments.data = meanTrace.fast.emg(visualizeEpoc,:);
-		manualAdjustments.samplingInstants = samplingInstants;
+
 		for p = 1:length(numericalResults)
 			if ~isnan(numericalResults(p).reflexInitIndex)
 				manualAdjustments.currentInit(p) = numericalResults(p).reflexInitIndex+int32(parameters.samplingFreq*0.05);
@@ -178,7 +192,7 @@ for f = 3%1:length(fileList);%:1:length(fileList); %Go through files in a direct
 		for p = 1:3
 			disp(['after ' num2str(p) ' lat ' num2str(manualAdjustments.currentInit(p))]);
 		end
-
+		latencies(s).fast.manualAdjustments = manualAdjustments;
 		numericalResults = reAnalyzeStretch(meanTrace.fast.emg,parameters,manualAdjustments);
 		%Print results
 		fprintf(resultFile,"%s\t%f\t%f\t%f\t%f\t", ...
@@ -200,22 +214,26 @@ for f = 3%1:length(fileList);%:1:length(fileList); %Go through files in a direct
 		
 		if isfield(meanTrace,'slow') % check if slow exists
 			%Numerical analysis
-			parameters = struct();
-			parameters.trigger = data.constants.preTriggerEpoc;
-			parameters.samplingFreq =meanTrace.slow.samplingFreq;
-			numericalResults = analyzeStretch(meanTrace.slow.emg,parameters);
-			%Numerical analysis done	
-
-
-			
-			
-
-			%Plot test figure
-			overlayFig = figure('__graphics_toolkit__','fltk','position',[10 10 600 600],'visible','off');
 			samplingFreq =meanTrace.slow.samplingFreq;
 			visualizeEpoc = data.constants.preTriggerEpoc-int32(samplingFreq*0.05):data.constants.preTriggerEpoc+int32(samplingFreq*0.15);
 			samplingInstants = linspace(-50,150,length(visualizeEpoc));
+			parameters = struct();
+			parameters.trigger = data.constants.preTriggerEpoc;
+			parameters.samplingFreq = samplingFreq;		
+			if length(latencies) >= s && isfield(latencies(s),'slow')
+				manualAdjustments = latencies(s).slow.manualAdjustments;
+				numericalResults = reAnalyzeStretch(meanTrace.slow.emg,parameters,manualAdjustments);
+			else
+				manualAdjustments = struct();
+				manualAdjustments.epoch = int32(samplingFreq*0.02);
+				manualAdjustments.data = meanTrace.slow.emg(visualizeEpoc,:);
+				manualAdjustments.samplingInstants = samplingInstants;
+				numericalResults = analyzeStretch(meanTrace.slow.emg,parameters);
+			end
 			
+			%Plot test figure
+			overlayFig = figure('__graphics_toolkit__','fltk','position',[10 10 600 600],'visible','off');
+
 			%Highlight analyzed epochs
 			reflexEpoc = data.constants.preTriggerEpoc+int32(samplingFreq*(numericalResults(1).latency/1000.0)):data.constants.preTriggerEpoc+int32(samplingFreq*(numericalResults(1).latency/1000.0))+int32(samplingFreq*0.02)-1;
 			reflexInstants = linspace(numericalResults(1).latency,numericalResults(1).latency+20,length(reflexEpoc));
@@ -267,6 +285,7 @@ for f = 3%1:length(fileList);%:1:length(fileList); %Go through files in a direct
 			waitfor(waitButton);
 			disp('returned from callback');
 			%Manual adjustments done
+			latencies(s).slow.manualAdjustments = manualAdjustments;
 			numericalResults = reAnalyzeStretch(meanTrace.slow.emg,parameters,manualAdjustments);
 			%Print results
 			fprintf(resultFile,"%s\t%f\t%f\t%f\t%f\t", ...
@@ -291,6 +310,14 @@ for f = 3%1:length(fileList);%:1:length(fileList); %Go through files in a direct
 
 	end
 	fprintf(resultFile,"\n");
+		%save data here
+	
+	if exist ('OCTAVE_VERSION', 'builtin') %OCTAVE
+		save([constants.latencyFolder separator fileList(f).name],'-mat-binary','latencies');
+	else
+		save([constants.latencyFolder separator fileList(f).name,'latencies']);
+	end
+	
 	clear data;
 end
 fclose(resultFile);

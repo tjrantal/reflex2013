@@ -1,22 +1,9 @@
 function mouseLeftClickTest(objH,evt)
-	global initLineHandle overlayTrace currentInit yLims xLims data epoch currentInit;
-    keepGoing =0;
-    if strcmp(get(objH,'SelectionType'),'alt') %Right click, stop digitizing
-        keepGoing =0;
-		%Get the initIndex here
-        if exist('returnedPath','var')
-			%Set the initIndex here
-            %digitizedPath = cat(1,digitizedPath,returnedPath+1);
-        end
-        disp('Stopped');
-        set(gcf,'WindowButtonMotionFcn','');
-		set(gcf,'WindowButtonUpFcn','');	%Set the callback to nothing
-        disp('Done digitizing');
-		%Plot the final selection here
-        %plot(digitizedPath(:,2),digitizedPath(:,1),'b-');
-    else
+	global initLineHandle overlayTrace sAx currentInit yLims xLims data epoch currentInit;
 		%Left click, set seedPoint
 		%Get the initIndex here
+		currentAxisIndex = find(sAx == get(objH,'Children'),1,'first');
+		
         if exist('returnedPath','var')
 			%Set the initIndex here
             %digitizedPath = cat(1,digitizedPath,returnedPath+1);
@@ -36,15 +23,14 @@ function mouseLeftClickTest(objH,evt)
             %digitizedPath(1,2) = seedPoint(1);
         end
         %drawnow;
-		set(initLineHandle,'XData',[point(1) point(1)],'YData',yLims); %N.B. row, column and index differs by 1!!!
+		set(initLineHandle(currentAxisIndex),'XData',[point(1) point(1)],'YData',yLims); %N.B. row, column and index differs by 1!!!
 		currentInit = max([1 find(data(1,:) >= point(1),1,'first')]);	%Cannot have init less than 1 
 		endEpoch = min([currentInit+epoch-1 size(data,2)]); %Prevent trying to plot out of bounds
 		plotEpoch = currentInit:endEpoch;
-		set(overlayTrace,'XData',data(1,plotEpoch) ,'YData',data(2,plotEpoch)); %N.B. row, column and index differs by 1!!!
+		set(overlayTrace(currentAxisIndex),'XData',data(1,plotEpoch) ,'YData',data(2,plotEpoch)); %N.B. row, column and index differs by 1!!!
 		set(get(objH,'Children'),'xlim',xLims,'ylim',yLims);
 		%plot([point(1) point(1)],'YData',yLims,'g');
 		%plot(point(1),point(2),'r*');
         disp('Left Click');
 		drawnow();
-    end
 endfunction

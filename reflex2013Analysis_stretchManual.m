@@ -131,7 +131,7 @@ for f = 1:length(fileList);%:1:length(fileList); %Go through files in a director
 		parameters = struct();
 		parameters.trigger = data.constants.preTriggerEpoc;
 		parameters.samplingFreq = samplingFreq;		
-		if length(latencies) >= s && isfield(latencies(s),'fast')
+		if length(latencies) >= s && isfield(latencies(s),'fast') && ~isempty(latencies(s).fast)
 			manualAdjustments = latencies(s).fast.manualAdjustments;
 			numericalResults = reAnalyzeStretch(meanTrace.fast.emg,parameters,manualAdjustments);
 		else
@@ -224,7 +224,7 @@ for f = 1:length(fileList);%:1:length(fileList); %Go through files in a director
 			parameters = struct();
 			parameters.trigger = data.constants.preTriggerEpoc;
 			parameters.samplingFreq = samplingFreq;		
-			if length(latencies) >= s && isfield(latencies(s),'slow')
+			if length(latencies) >= s && isfield(latencies(s),'slow') && ~isempty(latencies(s).slow)
 				manualAdjustments = latencies(s).slow.manualAdjustments;
 				numericalResults = reAnalyzeStretch(meanTrace.slow.emg,parameters,manualAdjustments);
 			else

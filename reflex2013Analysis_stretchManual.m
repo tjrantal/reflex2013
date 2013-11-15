@@ -85,15 +85,15 @@ fileList = dir([constants.dataFolder  separator '*.' constants.dataFileSuffix]);
 %keyboard
 stretchData = struct();
 
-resultFile = fopen('StretchResultsManual.xls','w');	%Open a file for writing the results to
+resultFile = fopen('StretchResultsManualAdjustedHeaders.xls','w');	%Open a file for writing the results to
 %print the header
 fprintf(resultFile,"FName\t");
-for i = 1:12
-		fprintf(resultFile,"condition\tlatency [ms]\tinitial 5 ms RMS [mV]\tlast 15 ms RMS [mV]\treflex 20 ms RMS [mV]\t");
+for j = 1:3	%Print results for all three muscles analysed
+	for i = 1:12
+			fprintf(resultFile,"condition\tlatency [ms]\tinitial 5 ms RMS [mV]\tlast 15 ms RMS [mV]\treflex 20 ms RMS [mV]\t");
+	end
 end
 fprintf(resultFile,"\n");
-
-
 
 graphics_toolkit fltk;
 for f = 1:length(fileList);%:1:length(fileList); %Go through files in a directory
@@ -185,11 +185,13 @@ for f = 1:length(fileList);%:1:length(fileList); %Go through files in a director
 		plot(samplingInstants,meanTrace.fast.trigger(visualizeEpoc),'k-','linewidth',3);
 		
 		%Adjust results manually at this point
-		waitButton = waitbar(0,'Done','position',[610 610 200 50]);
-		set(overlayFig,'visible','on','WindowButtonUpFcn',@mouseLeftClick);
-		disp('Callback set');
-		waitfor(waitButton);
-		disp('returned from callback');
+		if 1  %Removed to go through the analysis without manual adjustments
+			waitButton = waitbar(0,'Done','position',[610 610 200 50]);
+			set(overlayFig,'visible','on','WindowButtonUpFcn',@mouseLeftClick);
+			disp('Callback set');
+			waitfor(waitButton);
+			disp('returned from callback');
+		end
 		%Manual adjustments done
 		if 0	%debugging
 			for p = 1:3
@@ -199,17 +201,20 @@ for f = 1:length(fileList);%:1:length(fileList); %Go through files in a director
 		latencies(s).fast.manualAdjustments = manualAdjustments;
 		numericalResults = reAnalyzeStretch(meanTrace.fast.emg,parameters,manualAdjustments);
 		%Print results
-		fprintf(resultFile,"%s\t%f\t%f\t%f\t%f\t", ...
-			[constants.trialGroups{s} '_fast'] ...
-			,numericalResults(1).latency ...
-			,numericalResults(1).first5 ...
-			,numericalResults(1).last15 ...
-			,numericalResults(1).ms20 ...
-			);
+		for mm = 1:3
+			fprintf(resultFile,"%s\t%f\t%f\t%f\t%f\t", ...
+				[constants.trialGroups{s} '_' data.constants.varNames{2+mm} '_fast'] ...
+				,numericalResults(mm).latency ...
+				,numericalResults(mm).first5 ...
+				,numericalResults(mm).last15 ...
+				,numericalResults(mm).ms20 ...
+				);
+		end
 		
 		
 		if exist ('OCTAVE_VERSION', 'builtin') %OCTAVE
 			set(overlayFig,'visible','on');
+			drawnow();
 			print('-dpng','-r300','-S2400,2400',[constants.visualizationFolder constants.separator fileList(f).name(1:length(fileList(f).name)-4) constants.separator fName '_' constants.trialGroups{s} '_fast' '.png']);
 		else	%MATLAB
 			print('-dpng','-r300',[constants.visualizationFolder constants.separator fileList(f).name(1:length(fileList(f).name)-4) constants.separator fName  '_' constants.trialGroups{s} '_fast' '.png']);
@@ -285,26 +290,30 @@ for f = 1:length(fileList);%:1:length(fileList); %Go through files in a director
 			set(overlayFig,'currentaxes',sAxis(plotGeometry(1)*plotGeometry(2)));
 			plot(samplingInstants,meanTrace.slow.trigger(visualizeEpoc),'k-','linewidth',3);
 			%Adjust results manually at this point
-			waitButton = waitbar(0,'Done','position',[610 610 200 50]);
-			set(overlayFig,'visible','on','WindowButtonUpFcn',@mouseLeftClick);
-			disp('Callback set');
-			waitfor(waitButton);
-			disp('returned from callback');
-			%Manual adjustments done
+			if 1  %Removed to go through the analysis without manual adjustments
+				waitButton = waitbar(0,'Done','position',[610 610 200 50]);
+				set(overlayFig,'visible','on','WindowButtonUpFcn',@mouseLeftClick);
+				disp('Callback set');
+				waitfor(waitButton);
+				disp('returned from callback');
+			end
 			latencies(s).slow.manualAdjustments = manualAdjustments;
 			numericalResults = reAnalyzeStretch(meanTrace.slow.emg,parameters,manualAdjustments);
 			%Print results
-			fprintf(resultFile,"%s\t%f\t%f\t%f\t%f\t", ...
-				[constants.trialGroups{s} '_slow'] ...
-				,numericalResults(1).latency ...
-				,numericalResults(1).first5 ...
-				,numericalResults(1).last15 ...
-				,numericalResults(1).ms20 ...
-				);	
-		
+			%Print results
+			for mm = 1:3
+				fprintf(resultFile,"%s\t%f\t%f\t%f\t%f\t", ...
+					[constants.trialGroups{s} '_' data.constants.varNames{2+mm} '_slow'] ...
+					,numericalResults(mm).latency ...
+					,numericalResults(mm).first5 ...
+					,numericalResults(mm).last15 ...
+					,numericalResults(mm).ms20 ...
+					);
+			end
 
 			if exist ('OCTAVE_VERSION', 'builtin') %OCTAVE
 				set(overlayFig,'visible','on');
+				drawnow();
 				print('-dpng','-r300','-S2400,2400',[constants.visualizationFolder constants.separator fileList(f).name(1:length(fileList(f).name)-4) constants.separator fName '_' constants.trialGroups{s} '_slow' '.png']);
 			else	%MATLAB
 				print('-dpng','-r300',[constants.visualizationFolder constants.separator fileList(f).name(1:length(fileList(f).name)-4) constants.separator fName  '_' constants.trialGroups{s} '_slow' '.png']);
